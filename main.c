@@ -6,7 +6,7 @@
 /*   By: macbook <macbook@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/03 22:33:12 by macbook           #+#    #+#             */
-/*   Updated: 2024/11/04 01:02:19 by macbook          ###   ########.fr       */
+/*   Updated: 2024/11/04 02:16:14 by macbook          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,24 @@ void	print_list(t_stack_node *head)
 	printf("NULL\n");
 }
 
+static void	swap(t_stack_node **stack)
+{
+	t_stack_node	*first_node;
+	t_stack_node	*second_node;
+
+	if (*stack == NULL || (*stack)->next == NULL)
+		return ;
+	first_node = *stack;
+	second_node = first_node->next;
+	first_node->next = second_node->next;
+	first_node->prev = second_node;
+	if (second_node->next != NULL)
+		second_node->next->prev = first_node;
+	second_node->next = first_node;
+	second_node->prev = NULL;
+	*stack = second_node;
+}
+
 t_stack_node	*remove_from_beginning(t_stack_node **head)
 {
 	t_stack_node	*removed_node;
@@ -95,6 +113,42 @@ t_stack_node	*remove_from_beginning(t_stack_node **head)
 		(*head)->prev = NULL;
 	removed_node->next = NULL;
 	return (removed_node);
+}
+
+static void	push(t_stack_node **src, t_stack_node **target)
+{
+	t_stack_node	*first_node;
+
+	if (*src == NULL)
+		return ;
+	first_node = remove_from_beginning(src);
+	if (target == NULL)
+	{
+		*target = first_node;
+		first_node->next = NULL;
+	}
+	else
+	{
+		first_node->next = *target;
+		first_node->next->prev = first_node;
+		*target = first_node;
+	}
+}
+
+static void	rotate(t_stack_node **stack)
+{
+	t_stack_node	*first_node;
+	t_stack_node	*current;
+
+	if (*stack == NULL || (*stack)->next == NULL)
+		return ;
+	first_node = remove_from_beginning(stack);
+	current = *stack;
+	while (current->next != NULL)
+		current = current->next;
+	current->next = first_node;
+	first_node->prev = current;
+	first_node->next = NULL;
 }
 
 t_stack_node	*remove_from_end(t_stack_node **head)
@@ -117,45 +171,42 @@ t_stack_node	*remove_from_end(t_stack_node **head)
 	return (temp);
 }
 
-static void	swap(t_stack_node **stack)
+static void	reverse_rotate(t_stack_node **stack)
 {
-	t_stack_node	*first_node;
-	t_stack_node	*second_node;
+	t_stack_node	*last_node;
+	t_stack_node	*current;
 
 	if (*stack == NULL || (*stack)->next == NULL)
-		return;
-
-	first_node = *stack;
-	second_node = first_node->next;
-
-	first_node->next = second_node->next;
-	first_node->prev = second_node;
-	
-	if (second_node->next != NULL)
-		second_node->next->prev = first_node;
-
-	second_node->next = first_node;
-	second_node->prev = NULL;
-
-	*stack = second_node;
+		return ;
+    current = *stack;
+	last_node = remove_from_end(stack);
+	last_node->next = current;
+	current->prev = last_node;
+    *stack = last_node;
 }
 
 int	main(void)
 {
-	t_stack_node	*head;
+	t_stack_node	*a;
+	t_stack_node	*b;
 
-	head = NULL;
-	add_to_beginning(&head, 7);
-	add_to_beginning(&head, -34);
-	add_to_beginning(&head, 1);
-	add_to_beginning(&head, 43);
-	add_to_beginning(&head, 22);
-	add_to_beginning(&head, -98);
-	add_to_beginning(&head, 67);
+	a = NULL;
+	b = NULL;
+	add_to_beginning(&a, 7);
+	add_to_beginning(&a, -34);
+	add_to_beginning(&a, 1);
+	add_to_beginning(&a, 43);
+	add_to_beginning(&a, 22);
+	add_to_beginning(&a, -98);
+	add_to_beginning(&a, 67);
 	// add_to_end(&head, 30);
 	// add_to_end(&head, 40);
-	print_list(head);
-	swap(&head);
-	print_list(head);
+	// add_to_beginning(&b, 123);
+	print_list(a);
+	// swap(&a);
+	// push(&a, &b);
+	reverse_rotate(&a);
+	print_list(a);
+	// print_list(b);
 	return (0);
 }
