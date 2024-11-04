@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: macbook <macbook@student.42.fr>            +#+  +:+       +#+        */
+/*   By: auplisas <auplisas@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/03 22:33:12 by macbook           #+#    #+#             */
-/*   Updated: 2024/11/04 02:16:14 by macbook          ###   ########.fr       */
+/*   Updated: 2024/11/04 14:08:05 by auplisas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 typedef struct s_stack_node
 {
@@ -19,6 +20,8 @@ typedef struct s_stack_node
 	struct s_stack_node	*next;
 	struct s_stack_node	*prev;
 }						t_stack_node;
+
+//-----------CREATE LINKED LIST-----------//
 
 t_stack_node	*create_node(int value)
 {
@@ -83,6 +86,23 @@ void	print_list(t_stack_node *head)
 	printf("NULL\n");
 }
 
+//-----------UTILS--------------//
+t_stack_node	*remove_from_beginning(t_stack_node **head)
+{
+	t_stack_node	*removed_node;
+
+	if (*head == NULL)
+		return (NULL);
+	removed_node = *head;
+	*head = (*head)->next;
+	if (*head != NULL)
+		(*head)->prev = NULL;
+	removed_node->next = NULL;
+	return (removed_node);
+}
+
+//-------------SWAP-------------//
+
 static void	swap(t_stack_node **stack)
 {
 	t_stack_node	*first_node;
@@ -101,19 +121,26 @@ static void	swap(t_stack_node **stack)
 	*stack = second_node;
 }
 
-t_stack_node	*remove_from_beginning(t_stack_node **head)
+void	sa(t_stack_node **a)
 {
-	t_stack_node	*removed_node;
-
-	if (*head == NULL)
-		return (NULL);
-	removed_node = *head;
-	*head = (*head)->next;
-	if (*head != NULL)
-		(*head)->prev = NULL;
-	removed_node->next = NULL;
-	return (removed_node);
+	swap(a);
+	write(1, "sa\n", 3);
 }
+
+void	sb(t_stack_node **b)
+{
+	swap(b);
+	write(1, "sb\n", 3);
+}
+
+void	ss(t_stack_node **a, t_stack_node **b)
+{
+	swap(a);
+	swap(b);
+	write(1, "ss\n", 3);
+}
+
+//-------------PUSH-------------//
 
 static void	push(t_stack_node **src, t_stack_node **target)
 {
@@ -135,6 +162,20 @@ static void	push(t_stack_node **src, t_stack_node **target)
 	}
 }
 
+void	pa(t_stack_node **src, t_stack_node **target)
+{
+	push(src, target);
+	write(1, "pa\n", 3);
+}
+
+void	pb(t_stack_node **src, t_stack_node **target)
+{
+	push(src, target);
+	write(1, "pb\n", 3);
+}
+
+//-------------ROTATE-------------//
+
 static void	rotate(t_stack_node **stack)
 {
 	t_stack_node	*first_node;
@@ -150,6 +191,27 @@ static void	rotate(t_stack_node **stack)
 	first_node->prev = current;
 	first_node->next = NULL;
 }
+
+void	ra(t_stack_node **a)
+{
+	rotate(a);
+	write(1, "ra\n", 3);
+}
+
+void	rb(t_stack_node **b)
+{
+	rotate(b);
+	write(1, "rb\n", 3);
+}
+
+void	rr(t_stack_node **a, t_stack_node **b)
+{
+	rotate(a);
+	rotate(b);
+	write(1, "rr\n", 3);
+}
+
+//-------------REVERSE ROTATE-------------//
 
 t_stack_node	*remove_from_end(t_stack_node **head)
 {
@@ -178,12 +240,33 @@ static void	reverse_rotate(t_stack_node **stack)
 
 	if (*stack == NULL || (*stack)->next == NULL)
 		return ;
-    current = *stack;
+	current = *stack;
 	last_node = remove_from_end(stack);
 	last_node->next = current;
 	current->prev = last_node;
-    *stack = last_node;
+	*stack = last_node;
 }
+
+void	rra(t_stack_node **a)
+{
+	reverse_rotate(a);
+	write(1, "rra\n", 4);
+}
+
+void	rrb(t_stack_node **b)
+{
+	reverse_rotate(b);
+	write(1, "rrb\n", 4);
+}
+
+void	rrr(t_stack_node **a, t_stack_node **b)
+{
+	reverse_rotate(a);
+	reverse_rotate(b);
+	write(1, "rrr\n", 4);
+}
+
+//----------------------------------------//
 
 int	main(void)
 {
@@ -205,7 +288,7 @@ int	main(void)
 	print_list(a);
 	// swap(&a);
 	// push(&a, &b);
-	reverse_rotate(&a);
+	rra(&a);
 	print_list(a);
 	// print_list(b);
 	return (0);
