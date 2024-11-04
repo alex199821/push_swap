@@ -6,7 +6,7 @@
 /*   By: auplisas <auplisas@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/03 22:33:12 by macbook           #+#    #+#             */
-/*   Updated: 2024/11/04 16:22:28 by auplisas         ###   ########.fr       */
+/*   Updated: 2024/11/04 17:48:08 by auplisas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@
 typedef struct s_stack_node
 {
 	int					value;
+	int					index;
+	int					total_length;
 	struct s_stack_node	*next;
 	struct s_stack_node	*prev;
 }						t_stack_node;
@@ -32,6 +34,8 @@ t_stack_node	*create_node(int value)
 	if (!new_node)
 		return (NULL);
 	new_node->value = value;
+	new_node->index = -1;
+	new_node->total_length = 0;
 	new_node->next = NULL;
 	new_node->prev = NULL;
 	return (new_node);
@@ -319,19 +323,27 @@ t_stack_node	*find_largest(t_stack_node **stack)
 {
 	t_stack_node	*current;
 	t_stack_node	*largest;
+	int				i;
 
+	i = 0;
 	if (!stack)
 	{
 		return (NULL);
 	}
 	current = *stack;
 	largest = *stack;
+	largest->index = 0;
 	while (current)
 	{
 		if (current->value > largest->value)
+		{
 			largest = current;
+			largest->index = i;
+		}
 		current = current->next;
+		i++;
 	}
+	largest->total_length = i;
 	return (largest);
 }
 
@@ -350,25 +362,84 @@ t_stack_node	*find_largest(t_stack_node **stack)
 // 	return (current);
 // }
 
+// printf("Largest Node Value is: %d\n", largest_node->value);
+// printf("Largest Node Index is: %d\n", largest_node->index);
+// printf("Length of Linked List is: %d\n", largest_node->total_length)
+// void	sort_stacks(t_stack_node **a, t_stack_node **b, int list_length, int i)
+// {
+// 	t_stack_node	*largest_node;
+
+// 	largest_node = find_largest(a);
+// 	if (largest_node == NULL)
+// 	{
+// 		// Handle the error, e.g., print an error message and return (return);
+// 	}
+// 	if ((is_sorted(*b) == 1 && list_length == ft_lstsize(*b)))
+// 	{
+// 		printf("LIST IS SORTED\n");
+// 		printf("Largest Node Index is: %d\n", largest_node->index);
+// 		return ;
+// 	}
+// 	else
+// 	{
+// 		i++;
+// 		if (largest_node->index == 0)
+// 		{
+// 			pb(a, b);
+// 			sort_stacks(a, b, list_length, i);
+// 		}
+// 		else if (largest_node->total_length / largest_node->index <= 1)
+// 		{
+// 			rra(a);
+// 			sort_stacks(a, b, list_length, i);
+// 		}
+// 		else if (largest_node->total_length / largest_node->index >= 2)
+// 		{
+// 			ra(a);
+// 			sort_stacks(a, b, list_length, i);
+// 		}
+// 	}
+// }
+
 void	sort_stacks(t_stack_node **a, t_stack_node **b, int list_length)
 {
 	t_stack_node	*largest_node;
 
-	if (is_sorted(*a) == 1 && list_length == ft_lstsize(*a))
+	if (a == NULL || b == NULL || *a == NULL)
 	{
-		printf("LIST IS SORTED");
+		printf("Invalid stack(s)\n");
+		return ;
+	}
+	largest_node = find_largest(a);
+	if (largest_node == NULL)
+	{
+		printf("No largest node found\n");
+		return ;
+	}
+	if (is_sorted(*b) == 1 && list_length == ft_lstsize(*b))
+	{
+		printf("LIST IS SORTED\n");
 		return ;
 	}
 	else
 	{
-		largest_node = find_largest(a);
-		printf("Largest Node Value is: %d\n", largest_node->value);
-		// if(*a->value > ft_lstlast(*a)->value)
-		// {
-		// 	rra(&a);
-		// }
-		// tiny_sort(a);
-		return ;
+		if (largest_node->index == 0)
+		{
+			pb(a, b);
+			sort_stacks(a, b, list_length);
+		}
+		else if (largest_node->index != 0 && largest_node->total_length
+			/ largest_node->index <= 1)
+		{
+			rra(a);
+			sort_stacks(a, b, list_length);
+		}
+		else if (largest_node->index != 0 && largest_node->total_length
+			/ largest_node->index >= 2)
+		{
+			ra(a);
+			sort_stacks(a, b, list_length);
+		}
 	}
 }
 
@@ -384,26 +455,29 @@ int	main(void)
 {
 	t_stack_node	*a;
 	t_stack_node	*b;
+	int				count;
 
 	a = NULL;
 	b = NULL;
+	count = 0;
 	add_to_beginning(&a, 1);
 	add_to_beginning(&a, -34);
-	add_to_beginning(&a, 7);
 	add_to_beginning(&a, 199);
-	add_to_beginning(&a, 22);
 	add_to_beginning(&a, -98);
+	add_to_beginning(&a, 22);
+	add_to_beginning(&a, 7);
 	add_to_beginning(&a, 67);
 	add_to_beginning(&a, 123);
 	// add_to_end(&head, 30);
 	// add_to_end(&head, 40);
 	print_list(a);
-	push_swap(&a, &b);
+	push_swap(&a, &b, count);
 	// swap(&a);
 	// push(&a, &b);
 	// pb(&a, &b);
 	// print_list(a);
+	// print_list(a);
 	// print_list(b);
-	// print_list(b);
+	print_list(b);
 	return (0);
 }
