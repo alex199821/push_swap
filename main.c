@@ -6,7 +6,7 @@
 /*   By: auplisas <auplisas@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/03 22:33:12 by macbook           #+#    #+#             */
-/*   Updated: 2024/11/04 18:23:31 by auplisas         ###   ########.fr       */
+/*   Updated: 2024/11/04 19:02:21 by auplisas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,46 +126,29 @@ static void	swap(t_stack_node **stack)
 	*stack = second_node;
 }
 
-void	sa(t_stack_node **a)
+void	sa(t_stack_node **a, int *count)
 {
 	swap(a);
 	write(1, "sa\n", 3);
+	(*count)++;
 }
 
-void	sb(t_stack_node **b)
+void	sb(t_stack_node **b, int *count)
 {
 	swap(b);
 	write(1, "sb\n", 3);
+	(*count)++;
 }
 
-void	ss(t_stack_node **a, t_stack_node **b)
+void	ss(t_stack_node **a, t_stack_node **b, int *count)
 {
 	swap(a);
 	swap(b);
 	write(1, "ss\n", 3);
+	(*count)++;
 }
 
 //-------------PUSH-------------//
-
-// static void	push(t_stack_node **src, t_stack_node **target)
-// {
-// 	t_stack_node	*first_node;
-
-// 	if (*src == NULL)
-// 		return ;
-// 	first_node = remove_from_beginning(src);
-// 	if (target == NULL)
-// 	{
-// 		*target = first_node;
-// 		first_node->next = NULL;
-// 	}
-// 	else
-// 	{
-// 		first_node->next = *target;
-// 		first_node->next->prev = first_node;
-// 		*target = first_node;
-// 	}
-// }
 
 static void	push(t_stack_node **src, t_stack_node **target)
 {
@@ -187,10 +170,11 @@ static void	push(t_stack_node **src, t_stack_node **target)
 	}
 }
 
-void	pa(t_stack_node **src, t_stack_node **target)
+void	pa(t_stack_node **src, t_stack_node **target, int *count)
 {
 	push(src, target);
 	write(1, "pa\n", 3);
+	(*count)++;
 }
 
 void	pb(t_stack_node **src, t_stack_node **target, int *count)
@@ -225,16 +209,18 @@ void	ra(t_stack_node **a, int *count)
 	write(1, "ra\n", 3);
 }
 
-void	rb(t_stack_node **b)
+void	rb(t_stack_node **b, int *count)
 {
 	rotate(b);
+	(*count)++;
 	write(1, "rb\n", 3);
 }
 
-void	rr(t_stack_node **a, t_stack_node **b)
+void	rr(t_stack_node **a, t_stack_node **b, int *count)
 {
 	rotate(a);
 	rotate(b);
+	(*count)++;
 	write(1, "rr\n", 3);
 }
 
@@ -281,16 +267,18 @@ void	rra(t_stack_node **a, int *count)
 	write(1, "rra\n", 4);
 }
 
-void	rrb(t_stack_node **b)
+void	rrb(t_stack_node **b, int *count)
 {
 	reverse_rotate(b);
+	(*count)++;
 	write(1, "rrb\n", 4);
 }
 
-void	rrr(t_stack_node **a, t_stack_node **b)
+void	rrr(t_stack_node **a, t_stack_node **b, int *count)
 {
 	reverse_rotate(a);
 	reverse_rotate(b);
+	(*count)++;
 	write(1, "rrr\n", 4);
 }
 
@@ -356,40 +344,24 @@ void	sort_stacks(t_stack_node **a, t_stack_node **b, int list_length,
 	t_stack_node	*largest_node;
 
 	if (a == NULL || b == NULL || *a == NULL)
-	{
-		printf("Invalid stack(s)\n");
 		return ;
-	}
 	largest_node = find_largest(a);
-	if (largest_node == NULL)
-	{
-		printf("No largest node found\n");
+	if ((is_sorted(*b) == 1 && list_length == ft_lstsize(*b)) || largest_node == NULL)
 		return ;
-	}
-	if (is_sorted(*b) == 1 && list_length == ft_lstsize(*b))
+	else if (largest_node->index == 0)
 	{
-		printf("LIST IS SORTED\n");
-		return ;
+		pb(a, b, count);
+		sort_stacks(a, b, list_length, count);
 	}
-	else
+	else if (largest_node->total_length / largest_node->index <= 1)
 	{
-		if (largest_node->index == 0)
-		{
-			pb(a, b, count);
-			sort_stacks(a, b, list_length, count);
-		}
-		else if (largest_node->index != 0 && largest_node->total_length
-			/ largest_node->index <= 1)
-		{
-			rra(a, count);
-			sort_stacks(a, b, list_length, count);
-		}
-		else if (largest_node->index != 0 && largest_node->total_length
-			/ largest_node->index >= 2)
-		{
-			ra(a, count);
-			sort_stacks(a, b, list_length, count);
-		}
+		rra(a, count);
+		sort_stacks(a, b, list_length, count);
+	}
+	else if (largest_node->total_length / largest_node->index >= 2)
+	{
+		ra(a, count);
+		sort_stacks(a, b, list_length, count);
 	}
 }
 
@@ -432,17 +404,50 @@ int	main(void)
 		add_to_beginning(&a, numbers[i]);
 		i++;
 	}
-	// add_to_beginning(&a, 1);
-	// add_to_beginning(&a, -34);
-	// add_to_beginning(&a, 199);
-	// add_to_beginning(&a, -98);
-	// add_to_beginning(&a, 22);
-	// add_to_beginning(&a, 7);
-	// add_to_beginning(&a, 67);
-	// add_to_beginning(&a, 123);
 	print_list(a);
 	push_swap(&a, &b, &count);
 	print_list(b);
 	printf("COUNT: %d\n", count);
 	return (0);
 }
+
+
+// void	sort_stacks(t_stack_node **a, t_stack_node **b, int list_length,
+// 		int *count)
+// {
+// 	t_stack_node	*largest_node;
+
+// 	if (a == NULL || b == NULL || *a == NULL)
+// 		return ;
+// 	largest_node = find_largest(a);
+// 	if ((is_sorted(*b) == 1 && list_length == ft_lstsize(*b)) || largest_node == NULL)
+// 		return ;
+// 	else if (largest_node->index == 0)
+// 	{
+// 		pb(a, b, count); //Take the first element at the top of a and put it at the top of b. Do nothing if a is empty
+// 		sort_stacks(a, b, list_length, count);
+// 	}
+// 	else if (largest_node->total_length / largest_node->index <= 1)
+// 	{
+// 		rra(a, count); //Shift down all elements of stack a by 1. The last element becomes the first one.
+// 		sort_stacks(a, b, list_length, count);
+// 	}
+// 	else if (largest_node->total_length / largest_node->index >= 2)
+// 	{
+// 		ra(a, count); //Shift up all elements of stack a by 1. The first element becomes the last one.
+// 		sort_stacks(a, b, list_length, count);
+// 	}
+// }
+
+//Whole list of commands i have:
+//sa (swap a): Swap the first 2 elements at the top of stack a. Do nothing if there is only one or no elements.
+//sb (swap b): Swap the first 2 elements at the top of stack b. Do nothing if there is only one or no elements.
+//ss : sa and sb at the same time.
+//pa (push a): Take the first element at the top of b and put it at the top of a. Do nothing if b is empty.
+//pb (push b): Take the first element at the top of a and put it at the top of b. Do nothing if a is empty.
+//ra (rotate a): Shift up all elements of stack a by 1. The first element becomes the last one.
+//rb (rotate b): Shift up all elements of stack b by 1. The first element becomes the last one.
+//rr : ra and rb at the same time.
+//rra (reverse rotate a): Shift down all elements of stack a by 1. The last element becomes the first one.
+//rrb (reverse rotate b): Shift down all elements of stack b by 1. The last element becomes the first one.
+//rrr : rra and rrb at the same time.
