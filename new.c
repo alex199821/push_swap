@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   new.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: macbook <macbook@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/03 22:33:12 by macbook           #+#    #+#             */
-/*   Updated: 2024/11/07 12:28:52 by macbook          ###   ########.fr       */
+/*   Updated: 2024/11/07 03:58:42 by macbook          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,88 +20,75 @@ typedef struct s_stack_node
 	int					value;
 	int					index;
 	int					total_length;
+	int					price;
+	int					chunk;
 	struct s_stack_node	*next;
 	struct s_stack_node	*prev;
 }						t_stack_node;
 
 ////TESSSSSSSSSSSSSTTTTTTTT//
 
-// Function to count the number of nodes in the linked list
-int	count_nodes(t_stack_node *head)
-{
-	int	count;
-
-	count = 0;
-	while (head)
-	{
-		count++;
-		head = head->next;
-	}
-	return (count);
-}
-
-// Function to convert the linked list to an array
-int	*list_to_array(t_stack_node *head, int length)
-{
-	int	*array;
-
-	array = malloc(length * sizeof(int));
-	if (!array)
-		return (NULL);
-	for (int i = 0; i < length; i++)
-	{
-		array[i] = head->value;
-		head = head->next;
-	}
-	return (array);
-}
-
-// Simple bubble sort function
-void	bubble_sort(int *array, int length)
+void	bubble_sort(int arr[], int size)
 {
 	int	temp;
 
-	for (int i = 0; i < length - 1; i++)
+	for (int i = 0; i < size - 1; i++)
 	{
-		for (int j = 0; j < length - i - 1; j++)
+		for (int j = 0; j < size - 1 - i; j++)
 		{
-			if (array[j] > array[j + 1])
+			if (arr[j] > arr[j + 1])
 			{
-				temp = array[j];
-				array[j] = array[j + 1];
-				array[j + 1] = temp;
+				// Swap the elements if they are in the wrong order
+				temp = arr[j];
+				arr[j] = arr[j + 1];
+				arr[j + 1] = temp;
 			}
 		}
 	}
 }
 
-// Function to find the median value of the linked list
-int	find_median(t_stack_node *head)
+void	printArray(int arr[], int size)
 {
-	int	length;
-	int	*array;
-	int	median;
+	int	i;
 
-	length = count_nodes(head);
-	if (length == 0)
-		return (0); // or handle empty list case appropriately
-	array = list_to_array(head, length);
-	if (!array)
-		return (0); // or handle memory allocation failure
-	bubble_sort(array, length);
-	// Calculate the median
-	if (length % 2 == 0)
+	i = 0;
+	while (i < size)
 	{
-		// Even number of elements
-		median = (array[length / 2 - 1] + array[length / 2]) / 2;
+		printf("%d, ", arr[i]);
+		i++;
 	}
-	else
+	printf("\n");
+}
+
+int	find_quintile(t_stack_node *stack, int *part)
+{
+	int				*ar;
+	t_stack_node	*current;
+	int				i;
+	int				size;
+	int				quintile_index;
+
+	i = 0;
+	current = stack;
+	while (current)
 	{
-		// Odd number of elements
-		median = array[length / 2];
+		current = current->next;
+		i++;
 	}
-	free(array); // Don't forget to free the allocated memory
-	return (median);
+	ar = (int *)malloc(i * sizeof(int));
+	size = i;
+	i = 0;
+	current = stack;
+	while (current)
+	{
+		ar[i] = current->value;
+		current = current->next;
+		i++;
+	}
+	bubble_sort(ar, size);
+	// printArray(ar, size);
+	quintile_index = size * ((float)*part / 5) - 1;
+	return (ar[quintile_index]);
 }
 //////////////////////////////////////////
 
@@ -119,6 +106,8 @@ t_stack_node	*create_node(int value)
 	new_node->total_length = 0;
 	new_node->next = NULL;
 	new_node->prev = NULL;
+	new_node->price = -1;
+	new_node->chunk = 0;
 	return (new_node);
 }
 
@@ -166,12 +155,24 @@ void	print_list(t_stack_node *head)
 	temp = head;
 	while (temp != NULL)
 	{
-		printf("%d --> ", temp->value);
+		printf("%d -->", temp->value);
 		temp = temp->next;
 	}
 	printf("NULL\n");
 }
 
+void	print_chunk(t_stack_node *head)
+{
+	t_stack_node	*temp;
+
+	temp = head;
+	while (temp != NULL)
+	{
+		printf("%d --> ", temp->chunk);
+		temp = temp->next;
+	}
+	printf("NULL\n");
+}
 //-----------UTILS--------------//
 t_stack_node	*remove_from_beginning(t_stack_node **head)
 {
@@ -210,14 +211,14 @@ static void	swap(t_stack_node **stack)
 void	sa(t_stack_node **a, int *count)
 {
 	swap(a);
-	write(1, "sa\n", 3);
+	// write(1, "sa\n", 3);
 	(*count)++;
 }
 
 void	sb(t_stack_node **b, int *count)
 {
 	swap(b);
-	write(1, "sb\n", 3);
+	// write(1, "sb\n", 3);
 	(*count)++;
 }
 
@@ -225,7 +226,7 @@ void	ss(t_stack_node **a, t_stack_node **b, int *count)
 {
 	swap(a);
 	swap(b);
-	write(1, "ss\n", 3);
+	// write(1, "ss\n", 3);
 	(*count)++;
 }
 
@@ -254,14 +255,14 @@ static void	push(t_stack_node **src, t_stack_node **target)
 void	pa(t_stack_node **src, t_stack_node **target, int *count)
 {
 	push(src, target);
-	write(1, "pa\n", 3);
+	// write(1, "pa\n", 3);
 	(*count)++;
 }
 
 void	pb(t_stack_node **src, t_stack_node **target, int *count)
 {
 	push(src, target);
-	write(1, "pb\n", 3);
+	// write(1, "pb\n", 3);
 	(*count)++;
 }
 
@@ -287,14 +288,14 @@ void	ra(t_stack_node **a, int *count)
 {
 	rotate(a);
 	(*count)++;
-	write(1, "ra\n", 3);
+	// write(1, "ra\n", 3);
 }
 
 void	rb(t_stack_node **b, int *count)
 {
 	rotate(b);
 	(*count)++;
-	write(1, "rb\n", 3);
+	// write(1, "rb\n", 3);
 }
 
 void	rr(t_stack_node **a, t_stack_node **b, int *count)
@@ -302,7 +303,7 @@ void	rr(t_stack_node **a, t_stack_node **b, int *count)
 	rotate(a);
 	rotate(b);
 	(*count)++;
-	write(1, "rr\n", 3);
+	// write(1, "rr\n", 3);
 }
 
 //-------------REVERSE ROTATE-------------//
@@ -345,14 +346,14 @@ void	rra(t_stack_node **a, int *count)
 {
 	reverse_rotate(a);
 	(*count)++;
-	write(1, "rra\n", 4);
+	// write(1, "rra\n", 4);
 }
 
 void	rrb(t_stack_node **b, int *count)
 {
 	reverse_rotate(b);
 	(*count)++;
-	write(1, "rrb\n", 4);
+	// write(1, "rrb\n", 4);
 }
 
 void	rrr(t_stack_node **a, t_stack_node **b, int *count)
@@ -360,7 +361,7 @@ void	rrr(t_stack_node **a, t_stack_node **b, int *count)
 	reverse_rotate(a);
 	reverse_rotate(b);
 	(*count)++;
-	write(1, "rrr\n", 4);
+	// write(1, "rrr\n", 4);
 }
 
 //----------------------------------------//
@@ -416,23 +417,102 @@ t_stack_node	*find_largest(t_stack_node **stack)
 		i++;
 	}
 	largest->total_length = i;
+	if (i / largest->index >= 2)
+	{
+		largest->price = largest->index;
+	}
+	else
+	{
+		largest->price = -(largest->index - i);
+	}
 	return (largest);
+}
+
+t_stack_node	*find_smallest(t_stack_node **stack)
+{
+	t_stack_node	*current;
+	t_stack_node	*smallest;
+	int				i;
+
+	i = 0;
+	if (!stack)
+	{
+		return (NULL);
+	}
+	current = *stack;
+	smallest = *stack;
+	smallest->index = 0;
+	while (current)
+	{
+		if (current->value < smallest->value)
+		{
+			smallest = current;
+			smallest->index = i;
+		}
+		current = current->next;
+		i++;
+	}
+	smallest->total_length = i;
+	if (i / smallest->index >= 2)
+	{
+		smallest->price = smallest->index;
+	}
+	else
+	{
+		smallest->price = -(smallest->index - i);
+	}
+	return (smallest);
+}
+
+void	push_by_chunks(t_stack_node **a, t_stack_node **b, int *count,
+		t_stack_node **saved_stack, int *part)
+{
+	int	quintile_num;
+
+	quintile_num = find_quintile(*saved_stack, part);
+	printf("Quantile is: %d\n", quintile_num);
+	printf("Part is: %d\n", *part);
+	if (ft_lstsize(*b) >= ft_lstsize(*saved_stack))
+	{
+		return ;
+	}
+	while (find_smallest(a)->value > quintile_num)
+	{
+		if ((*a)->value <= quintile_num)
+		{
+			pb(a, b, count);
+		}
+		else
+		{
+			ra(a, count);
+		}
+	}
+	(*part)++;
+	push_by_chunks(a, b, count, saved_stack, part);
 }
 
 void	sort_stacks(t_stack_node **a, t_stack_node **b, int list_length,
 		int *count)
 {
 	t_stack_node	*largest_node;
+	t_stack_node	*smallest_node;
 
 	if (a == NULL || b == NULL || *a == NULL)
 		return ;
 	largest_node = find_largest(a);
+	smallest_node = find_smallest(a);
 	if ((is_sorted(*b) == 1 && list_length == ft_lstsize(*b))
 		|| largest_node == NULL)
 		return ;
 	else if (largest_node->index == 0)
 	{
 		pb(a, b, count);
+		sort_stacks(a, b, list_length, count);
+	}
+	else if (smallest_node->index == 0)
+	{
+		pb(a, b, count);
+		rb(b, count);
 		sort_stacks(a, b, list_length, count);
 	}
 	else if (largest_node->total_length / largest_node->index <= 1)
@@ -447,46 +527,63 @@ void	sort_stacks(t_stack_node **a, t_stack_node **b, int list_length,
 	}
 }
 
-void	push_by_chunks(t_stack_node **a, t_stack_node **b, int list_length,
-		int *count)
+static void	push_copy(t_stack_node **src, t_stack_node **target)
 {
-	int	median;
-	int	iterations;
+	t_stack_node	*first_node;
 
-	iterations = 0;
-	median = find_median(*a);
-	while (ft_lstsize(*a) > list_length / 2)
-	{
-		if ((*a)->value <= median)
-		{
-			pb(a, b, count);
-		}
-		// else if ((*a)->prev && (*a)->prev->value <= median)
-		// {
-		// 	rra(a, count);
-		// }
-		else
-		{
-			rra(a, count);
-		}
-	}
-	if (ft_lstsize(*a) == 0)
-	{
+	if (*src == NULL)
 		return ;
+	// Create a new node and copy the values from the first node of the src list
+	first_node = (t_stack_node *)malloc(sizeof(t_stack_node));
+	if (first_node == NULL)
+		return ; // Handle memory allocation failure
+	first_node->value = (*src)->value;
+	first_node->index = (*src)->index;
+	first_node->total_length = (*src)->total_length;
+	first_node->price = (*src)->price;
+	first_node->chunk = (*src)->chunk;
+	first_node->prev = NULL;
+	if (*target == NULL)
+	{
+		*target = first_node;
+		first_node->next = NULL;
 	}
 	else
 	{
-		push_by_chunks(a, b, ft_lstsize(*a), count);
+		first_node->next = *target;
+		(*target)->prev = first_node;
+		*target = first_node;
 	}
 }
 
 void	push_swap(t_stack_node **a, t_stack_node **b, int *count)
 {
-	int	list_length;
+	int				list_length;
+	int				part;
+	t_stack_node	*next_node;
+	t_stack_node	*current;
+	t_stack_node	*saved_stack;
 
+	saved_stack = NULL;
 	list_length = ft_lstsize(*a);
-	push_by_chunks(a, b, list_length, count);
-	// printf("MEDIAN IS: %d\n", median);
+	current = *a;
+	// print_list(*b);
+	part = 1;
+	while (current != NULL)
+	{
+		if (current->next != NULL)
+		{
+			next_node = current->next;
+		}
+		else
+		{
+			next_node = NULL;
+		}
+		push_copy(&current, &saved_stack);
+		current = next_node;
+	}
+	// print_list(saved_stack);
+	push_by_chunks(a, b, count, &saved_stack, &part);
 	// sort_stacks(b, a, list_length, count);
 }
 
@@ -497,18 +594,8 @@ int	main(void)
 	int				count;
 	int				length;
 	int				i;
-	int				numbers[] = {-1831, 1527, -1245, 777, -232, 1945, 656,
-						-1010, 257, -1624, -318, 972, 223, 311, -190, 974, 1509,
-						21, -693, 1777, 1396, -1021, -651, 1123, -1570, 880,
-						-1568, -158, -1989, -962, -242, 711, -1976, -1544, 1853,
-						1979, 197, 1133, -642, -1608, -1666, 1837, -1448, -1346,
-						824, -173, 70, -403, 231, 799, -1663, -942, 1426, -1452,
-						558, 707, -1107, 1569, -1251, -834, -1240, -1822, -1913,
-						1352, -1586, -912, 856, -1533, -505, -1815, 705, -901,
-						769, -802, -1916, 13, -109, -678, -153, 295, -1280,
-						-111, 110, 761, -667, 446, 515, -1412, 1543, 1855,
-						-1959, -414, -1276, 482, -613, 1726, -1025, 1264, 370,
-						-672};
+	int				numbers[] = {42, 6, 8, 29, 26, 44, 11, 9, 35, 24, 49, 45,
+						33, 5, 34, 40, 38, 25, 43, 46};
 
 	a = NULL;
 	b = NULL;
@@ -521,81 +608,13 @@ int	main(void)
 		i++;
 	}
 	print_list(a);
+	// printf("\n\n");
 	push_swap(&a, &b, &count);
 	print_list(b);
-	print_list(a);
+	// print_list(a);
 	printf("COUNT: %d\n", count);
 	return (0);
 }
-
-// void	bubble_sort_to_b(t_stack_node **a, t_stack_node **b, int list_length,
-// 		int *count)
-// {
-// 	if (a == NULL || *a == NULL)
-// 		return ;
-// 	if (list_length == ft_lstsize(*b))
-// 		return ;
-// 	if ((*a)->next != NULL && ((*a)->value < (*a)->next->value))
-// 	{
-// 		sa(a, count);
-// 		bubble_sort_to_b(a, b, list_length, count);
-// 	}
-// 	else
-// 	{
-// 		pb(a, b, count);
-// 		bubble_sort_to_b(a, b, list_length, count);
-// 	}
-// }
-
-// void	bubble_sort_to_a(t_stack_node **a, t_stack_node **b, int list_length,
-// 		int *count)
-// {
-// 	if (b == NULL || *b == NULL)
-// 		return ;
-// 	if (list_length == ft_lstsize(*a))
-// 		return ;
-// 	if ((*b)->next != NULL && ((*b)->value > (*b)->next->value))
-// 	{
-// 		sb(b, count);
-// 		bubble_sort_to_a(a, b, list_length, count);
-// 	}
-// 	else
-// 	{
-// 		pa(b, a, count);
-// 		bubble_sort_to_a(a, b, list_length, count);
-// 	}
-// }
-
-// void	sort_stacks(t_stack_node **a, t_stack_node **b, int list_length,
-// 		int *count)
-// {
-// 	t_stack_node	*largest_node;
-
-// 	if (a == NULL || b == NULL || *a == NULL)
-// 		return ;
-// 	largest_node = find_largest(a);
-// 	if ((is_sorted(*b) == 1 && list_length == ft_lstsize(*b))
-// || largest_node == NULL)
-// 		return ;
-// 	else if (largest_node->index == 0)
-// 	{
-// 		pb(a, b, count);
-// Take the first element at the top of a and put it at the top of b. Do nothing if a is empty
-// 		sort_stacks(a, b, list_length, count);
-// 	}
-// 	else if (largest_node->total_length / largest_node->index <= 1)
-// 	{
-// 		rra(a, count);
-// Shift down all elements of stack a by 1. The last element becomes the first one.
-// 		sort_stacks(a, b, list_length, count);
-// 	}
-// 	else if (largest_node->total_length / largest_node->index >= 2)
-// 	{
-// 		ra(a, count);
-// Shift up all elements of stack a by 1. The first element becomes the last one.
-// 		sort_stacks(a, b, list_length, count);
-// 	}
-// }
 
 // Whole list of commands i have:
 // sa (swap a): Swap the first 2 elements at the top of stack a. Do nothing if there is only one or no elements.
