@@ -6,11 +6,12 @@
 /*   By: macbook <macbook@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/03 22:33:12 by macbook           #+#    #+#             */
-/*   Updated: 2024/11/07 12:28:52 by macbook          ###   ########.fr       */
+/*   Updated: 2024/11/07 23:27:25 by macbook          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <limits.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -20,6 +21,9 @@ typedef struct s_stack_node
 	int					value;
 	int					index;
 	int					total_length;
+	int					price;
+	bool				above_median;
+	struct s_stack_node	*target;
 	struct s_stack_node	*next;
 	struct s_stack_node	*prev;
 }						t_stack_node;
@@ -117,8 +121,11 @@ t_stack_node	*create_node(int value)
 	new_node->value = value;
 	new_node->index = -1;
 	new_node->total_length = 0;
+	new_node->above_median = NULL;
+	new_node->price = INT_MAX;
 	new_node->next = NULL;
 	new_node->prev = NULL;
+	new_node->target = NULL;
 	return (new_node);
 }
 
@@ -166,7 +173,7 @@ void	print_list(t_stack_node *head)
 	temp = head;
 	while (temp != NULL)
 	{
-		printf("%d --> ", temp->value);
+		printf("%d, ", temp->value);
 		temp = temp->next;
 	}
 	printf("NULL\n");
@@ -210,14 +217,14 @@ static void	swap(t_stack_node **stack)
 void	sa(t_stack_node **a, int *count)
 {
 	swap(a);
-	write(1, "sa\n", 3);
+	// write(1, "sa\n", 3);
 	(*count)++;
 }
 
 void	sb(t_stack_node **b, int *count)
 {
 	swap(b);
-	write(1, "sb\n", 3);
+	// write(1, "sb\n", 3);
 	(*count)++;
 }
 
@@ -225,7 +232,7 @@ void	ss(t_stack_node **a, t_stack_node **b, int *count)
 {
 	swap(a);
 	swap(b);
-	write(1, "ss\n", 3);
+	// write(1, "ss\n", 3);
 	(*count)++;
 }
 
@@ -254,14 +261,14 @@ static void	push(t_stack_node **src, t_stack_node **target)
 void	pa(t_stack_node **src, t_stack_node **target, int *count)
 {
 	push(src, target);
-	write(1, "pa\n", 3);
+	// write(1, "pa\n", 3);
 	(*count)++;
 }
 
 void	pb(t_stack_node **src, t_stack_node **target, int *count)
 {
 	push(src, target);
-	write(1, "pb\n", 3);
+	// write(1, "pb\n", 3);
 	(*count)++;
 }
 
@@ -287,14 +294,14 @@ void	ra(t_stack_node **a, int *count)
 {
 	rotate(a);
 	(*count)++;
-	write(1, "ra\n", 3);
+	// write(1, "ra\n", 3);
 }
 
 void	rb(t_stack_node **b, int *count)
 {
 	rotate(b);
 	(*count)++;
-	write(1, "rb\n", 3);
+	// write(1, "rb\n", 3);
 }
 
 void	rr(t_stack_node **a, t_stack_node **b, int *count)
@@ -302,7 +309,7 @@ void	rr(t_stack_node **a, t_stack_node **b, int *count)
 	rotate(a);
 	rotate(b);
 	(*count)++;
-	write(1, "rr\n", 3);
+	// write(1, "rr\n", 3);
 }
 
 //-------------REVERSE ROTATE-------------//
@@ -345,14 +352,14 @@ void	rra(t_stack_node **a, int *count)
 {
 	reverse_rotate(a);
 	(*count)++;
-	write(1, "rra\n", 4);
+	// write(1, "rra\n", 4);
 }
 
 void	rrb(t_stack_node **b, int *count)
 {
 	reverse_rotate(b);
 	(*count)++;
-	write(1, "rrb\n", 4);
+	// write(1, "rrb\n", 4);
 }
 
 void	rrr(t_stack_node **a, t_stack_node **b, int *count)
@@ -360,7 +367,7 @@ void	rrr(t_stack_node **a, t_stack_node **b, int *count)
 	reverse_rotate(a);
 	reverse_rotate(b);
 	(*count)++;
-	write(1, "rrr\n", 4);
+	// write(1, "rrr\n", 4);
 }
 
 //----------------------------------------//
@@ -419,75 +426,299 @@ t_stack_node	*find_largest(t_stack_node **stack)
 	return (largest);
 }
 
-void	sort_stacks(t_stack_node **a, t_stack_node **b, int list_length,
-		int *count)
+t_stack_node	*find_smallest(t_stack_node **stack)
 {
-	t_stack_node	*largest_node;
+	t_stack_node	*current;
+	t_stack_node	*smallest;
+	int				i;
 
-	if (a == NULL || b == NULL || *a == NULL)
-		return ;
-	largest_node = find_largest(a);
-	if ((is_sorted(*b) == 1 && list_length == ft_lstsize(*b))
-		|| largest_node == NULL)
-		return ;
-	else if (largest_node->index == 0)
+	i = 0;
+	if (!stack)
 	{
-		pb(a, b, count);
-		sort_stacks(a, b, list_length, count);
+		return (NULL);
 	}
-	else if (largest_node->total_length / largest_node->index <= 1)
+	current = *stack;
+	smallest = *stack;
+	smallest->index = 0;
+	while (current)
 	{
-		rra(a, count);
-		sort_stacks(a, b, list_length, count);
+		if (current->value < smallest->value)
+		{
+			smallest = current;
+			smallest->index = i;
+		}
+		current = current->next;
+		i++;
 	}
-	else if (largest_node->total_length / largest_node->index >= 2)
+	smallest->total_length = i;
+	return (smallest);
+}
+
+void	small_sort(t_stack_node **stack, int *count)
+{
+	t_stack_node	*largest;
+	int				list_length;
+
+	largest = find_largest(stack);
+	if (*stack == largest)
+		ra(stack, count);
+	else if ((*stack)->next == largest)
+		rra(stack, count);
+	if ((*stack)->value > (*stack)->next->value)
+		sa(stack, count);
+}
+
+void	push_to_b(t_stack_node **a, t_stack_node **b, int *count)
+{
+	while (ft_lstsize(*a) > 3)
 	{
-		ra(a, count);
-		sort_stacks(a, b, list_length, count);
+		pa(a, b, count);
 	}
 }
 
-void	push_by_chunks(t_stack_node **a, t_stack_node **b, int list_length,
-		int *count)
-{
-	int	median;
-	int	iterations;
+// static void	find_target(t_stack_node *a, t_stack_node *b)
+// {
+// 	t_stack_node	*current_a;
+// 	t_stack_node	*target_node;
+// 	int				best_match_index;
 
-	iterations = 0;
-	median = find_median(*a);
-	while (ft_lstsize(*a) > list_length / 2)
+// 	while (b)
+// 	{
+// 		best_match_index = INT_MAX;
+// 		current_a = a;
+// 		while (current_a)
+// 		{
+// 			if (current_a->value > b->value
+// 				&& current_a->value < best_match_index)
+// 			{
+// 				best_match_index = current_a->value;
+// 				target_node = current_a;
+// 			}
+// 			current_a = current_a->next;
+// 		}
+// 		if (INT_MAX == best_match_index)
+// 			b->target = find_smallest(&a);
+// 		else
+// 			b->target = target_node;
+// 		b = b->next;
+// 	}
+// }
+
+void	set_positions(t_stack_node *stack)
+{
+	int	i;
+	int	median_index;
+
+	i = 0;
+	if (!stack)
+		return ;
+	// if (ft_lstsize(stack) % 2 == 0)
+	// {
+	// 	median_index = ft_lstsize(stack) / 2 + 1;
+	// }
+	// else
+	// {
+	// 	median_index = ft_lstsize(stack) / 2;
+	// }
+	median_index = ft_lstsize(stack) / 2;
+	while (stack)
 	{
-		if ((*a)->value <= median)
-		{
-			pb(a, b, count);
-		}
-		// else if ((*a)->prev && (*a)->prev->value <= median)
-		// {
-		// 	rra(a, count);
-		// }
+		stack->index = i;
+		if (i <= median_index)
+			stack->above_median = false;
 		else
+			stack->above_median = true;
+		stack = stack->next;
+		i++;
+	}
+}
+
+static void	find_target(t_stack_node *a, t_stack_node *b)
+{
+	t_stack_node	*current;
+	t_stack_node	*target_node;
+	int				run;
+
+	while (b)
+	{
+		current = a;
+		run = 1;
+		while (current && run)
+		{
+			if (current->value > b->value)
+			{
+				target_node = current;
+				run = 0;
+			}
+			current = current->next;
+		}
+		if (b->value > find_largest(&a)->value)
+			b->target = find_smallest(&a);
+		else
+			b->target = target_node;
+		b = b->next;
+	}
+}
+
+
+static void	count_price(t_stack_node *a, t_stack_node *b)
+{
+	int	size_a;
+	int	size_b;
+	int	price;
+
+	size_a = ft_lstsize(a);
+	size_b = ft_lstsize(b);
+	while (b)
+	{
+		price = 0;
+		if (b->above_median == true && b->target->above_median == true)
+		{
+			price = (size_b - b->index) + (size_a - b->target->index);
+		}
+		else if (b->above_median == false && b->target->above_median == true)
+		{
+			price = (b->index) + (size_a - b->target->index);
+		}
+		else if (b->above_median == true && b->target->above_median == false)
+		{
+			price = (size_b - b->index) + (b->target->index);
+		}
+		else if (b->above_median == false && b->target->above_median == false)
+		{
+			price = (b->index) + (b->target->index);
+		}
+		b->price = price;
+		b = b->next;
+	}
+}
+
+t_stack_node	*find_cheapest(t_stack_node **stack)
+{
+	t_stack_node	*current;
+	t_stack_node	*cheapest;
+
+	if (!stack)
+	{
+		return (NULL);
+	}
+	current = *stack;
+	cheapest = *stack;
+	while (current)
+	{
+		if (current->price < cheapest->price)
+		{
+			cheapest = current;
+		}
+		current = current->next;
+	}
+	return (cheapest);
+}
+
+void	print_node_data(t_stack_node *head)
+{
+	t_stack_node	*temp;
+
+	temp = head;
+	while (temp != NULL)
+	{
+		printf("Node Value is: %d, Node's Index is: %d, ", temp->value,
+			temp->index);
+		printf("and its above median: %d\n", temp->above_median);
+		printf("Its Target is: %d, Its Target index is: %d, ",
+			temp->target->value, temp->target->index);
+		printf("price to push is: %d, and its target above median: %d\n\n\n",
+			temp->price, temp->target->above_median);
+		temp = temp->next;
+	}
+	printf("NULL\n");
+}
+
+void	print_single_node_data(t_stack_node *head)
+{
+	t_stack_node	*temp;
+
+	temp = head;
+	printf("Node Value is: %d, Node's Index is: %d, ", temp->value,
+		temp->index);
+	printf("and its above median: %d\n", temp->above_median);
+	printf("Its Target is: %d, Its Target index is: %d, ", temp->target->value,
+		temp->target->index);
+	printf("price to push is: %d, and its target above median: %d\n\n\n",
+		temp->price, temp->target->above_median);
+}
+
+void	perform_operations(t_stack_node **a, t_stack_node **b,
+		t_stack_node *cheapest, int *count)
+{
+	// print_list(*a);
+	// print_list(*b);
+	// print_single_node_data(cheapest);
+	// printf("\n\n\n");
+	if (cheapest->index == 0 && cheapest->target->index == 0)
+	{
+		pa(b, a, count);
+	}
+	else if (cheapest->index == 0 && cheapest->target->index != 0)
+	{
+		if (cheapest->target->above_median == true)
 		{
 			rra(a, count);
 		}
+		else if (cheapest->target->above_median == false)
+		{
+			ra(a, count);
+		}
 	}
-	if (ft_lstsize(*a) == 0)
+	else if (cheapest->index != 0 && cheapest->target->index == 0)
 	{
-		return ;
+		if (cheapest->target->above_median == true)
+		{
+			rrb(b, count);
+		}
+		else if (cheapest->target->above_median == false)
+		{
+			rb(b, count);
+		}
 	}
-	else
+	else if (cheapest->index != 0 && cheapest->target->index != 0)
 	{
-		push_by_chunks(a, b, ft_lstsize(*a), count);
+		if (cheapest->above_median == true
+			&& cheapest->target->above_median == true)
+		{
+			rrr(a, b, count);
+		}
+		else if (cheapest->above_median == false
+			&& cheapest->target->above_median == false)
+		{
+			rr(a, b, count);
+		}
+		else if (cheapest->above_median == false
+			&& cheapest->target->above_median == true)
+		{
+			rb(b, count);
+			rra(a, count);
+		}
+		else if (cheapest->above_median == true
+			&& cheapest->target->above_median == false)
+		{
+			rrb(b, count);
+			ra(a, count);
+		}
 	}
+	return ;
 }
 
 void	push_swap(t_stack_node **a, t_stack_node **b, int *count)
 {
-	int	list_length;
+	t_stack_node	*cheapest;
 
-	list_length = ft_lstsize(*a);
-	push_by_chunks(a, b, list_length, count);
-	// printf("MEDIAN IS: %d\n", median);
-	// sort_stacks(b, a, list_length, count);
+	set_positions(*a);
+	set_positions(*b);
+	find_target(*a, *b);
+	count_price(*a, *b);
+	cheapest = find_cheapest(b);
+	perform_operations(a, b, cheapest, count);
 }
 
 int	main(void)
@@ -497,18 +728,8 @@ int	main(void)
 	int				count;
 	int				length;
 	int				i;
-	int				numbers[] = {-1831, 1527, -1245, 777, -232, 1945, 656,
-						-1010, 257, -1624, -318, 972, 223, 311, -190, 974, 1509,
-						21, -693, 1777, 1396, -1021, -651, 1123, -1570, 880,
-						-1568, -158, -1989, -962, -242, 711, -1976, -1544, 1853,
-						1979, 197, 1133, -642, -1608, -1666, 1837, -1448, -1346,
-						824, -173, 70, -403, 231, 799, -1663, -942, 1426, -1452,
-						558, 707, -1107, 1569, -1251, -834, -1240, -1822, -1913,
-						1352, -1586, -912, 856, -1533, -505, -1815, 705, -901,
-						769, -802, -1916, 13, -109, -678, -153, 295, -1280,
-						-111, 110, 761, -667, 446, 515, -1412, 1543, 1855,
-						-1959, -414, -1276, 482, -613, 1726, -1025, 1264, 370,
-						-672};
+	int				numbers[] = {-91990, 94411, 25821, -39615, 67626, -38849, -95736, -69734, -62532, -66191, -59879, 45347, -94995, 69526, -89275, 56606, 73898, 58830, 14484, -89127, 55644, 23038, -55338, -83686, 45292, -19544, -96518, 60769, 7507, 94815, 24344, 71585, -13437, 21178, -10559, 7886, 73328, 15528, 41224, -44780, 64379, 18814, 53338, -82732, -68192, -18003, -1349, -23553, 288, 61045, -82099, 84340, 55375, -84411, -77718, 23084, 6215, -43903, -44835, 61088, -46109, -99858, 60621, 37630, 98779, -99084, 21562, 87283, -32191, -3741, -72682, -59577, -99578, -83747, 68606, 80656, 99513, -1273, 47311, -29072, 26075, -96021, 71566, -90894, -29361, -36538, 63832, 88133, 5772, 80354, 92019, 59231, 56203, 20336, 32465, -60497, 39098, -87183, 24043, 11195};
+	int				list_length;
 
 	a = NULL;
 	b = NULL;
@@ -520,82 +741,32 @@ int	main(void)
 		add_to_beginning(&a, numbers[i]);
 		i++;
 	}
-	print_list(a);
-	push_swap(&a, &b, &count);
+	// print_list(a);
+	list_length = ft_lstsize(a);
+	push_to_b(&a, &b, &count);
+	small_sort(&a, &count);
+	while (ft_lstsize(a) < list_length)
+	{
+		push_swap(&a, &b, &count);
+	}
 	print_list(b);
+	printf("Sorted List: \n");
+	while (a->value != find_smallest(&a)->value)
+	{
+		if (find_smallest(&a)->above_median == true)
+		{
+			rra(&a, &count);
+		}
+		else
+		{
+			ra(&a, &count);
+		}
+	}
 	print_list(a);
 	printf("COUNT: %d\n", count);
+	printf("Is sorted: %d\n", is_sorted(a));
 	return (0);
 }
-
-// void	bubble_sort_to_b(t_stack_node **a, t_stack_node **b, int list_length,
-// 		int *count)
-// {
-// 	if (a == NULL || *a == NULL)
-// 		return ;
-// 	if (list_length == ft_lstsize(*b))
-// 		return ;
-// 	if ((*a)->next != NULL && ((*a)->value < (*a)->next->value))
-// 	{
-// 		sa(a, count);
-// 		bubble_sort_to_b(a, b, list_length, count);
-// 	}
-// 	else
-// 	{
-// 		pb(a, b, count);
-// 		bubble_sort_to_b(a, b, list_length, count);
-// 	}
-// }
-
-// void	bubble_sort_to_a(t_stack_node **a, t_stack_node **b, int list_length,
-// 		int *count)
-// {
-// 	if (b == NULL || *b == NULL)
-// 		return ;
-// 	if (list_length == ft_lstsize(*a))
-// 		return ;
-// 	if ((*b)->next != NULL && ((*b)->value > (*b)->next->value))
-// 	{
-// 		sb(b, count);
-// 		bubble_sort_to_a(a, b, list_length, count);
-// 	}
-// 	else
-// 	{
-// 		pa(b, a, count);
-// 		bubble_sort_to_a(a, b, list_length, count);
-// 	}
-// }
-
-// void	sort_stacks(t_stack_node **a, t_stack_node **b, int list_length,
-// 		int *count)
-// {
-// 	t_stack_node	*largest_node;
-
-// 	if (a == NULL || b == NULL || *a == NULL)
-// 		return ;
-// 	largest_node = find_largest(a);
-// 	if ((is_sorted(*b) == 1 && list_length == ft_lstsize(*b))
-// || largest_node == NULL)
-// 		return ;
-// 	else if (largest_node->index == 0)
-// 	{
-// 		pb(a, b, count);
-// Take the first element at the top of a and put it at the top of b. Do nothing if a is empty
-// 		sort_stacks(a, b, list_length, count);
-// 	}
-// 	else if (largest_node->total_length / largest_node->index <= 1)
-// 	{
-// 		rra(a, count);
-// Shift down all elements of stack a by 1. The last element becomes the first one.
-// 		sort_stacks(a, b, list_length, count);
-// 	}
-// 	else if (largest_node->total_length / largest_node->index >= 2)
-// 	{
-// 		ra(a, count);
-// Shift up all elements of stack a by 1. The first element becomes the last one.
-// 		sort_stacks(a, b, list_length, count);
-// 	}
-// }
 
 // Whole list of commands i have:
 // sa (swap a): Swap the first 2 elements at the top of stack a. Do nothing if there is only one or no elements.

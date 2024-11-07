@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   saved_work.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: macbook <macbook@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/03 22:33:12 by macbook           #+#    #+#             */
-/*   Updated: 2024/11/07 01:35:53 by macbook          ###   ########.fr       */
+/*   Updated: 2024/11/07 13:16:24 by macbook          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -605,15 +605,12 @@ static void	push_copy(t_stack_node **src, t_stack_node **target)
 	first_node = (t_stack_node *)malloc(sizeof(t_stack_node));
 	if (first_node == NULL)
 		return ; // Handle memory allocation failure
-	// Copy values from the source node (we're not removing from src)
 	first_node->value = (*src)->value;
 	first_node->index = (*src)->index;
 	first_node->total_length = (*src)->total_length;
 	first_node->price = (*src)->price;
 	first_node->chunk = (*src)->chunk;
 	first_node->prev = NULL;
-	// New node should not have a previous link initially
-	// Insert the new node at the beginning of the target list
 	if (*target == NULL)
 	{
 		*target = first_node;
@@ -734,7 +731,7 @@ void	push_by_chunks_b(t_stack_node **a, t_stack_node **b, int list_length,
 						// }
 						// else
 						// {
-							sa(a, count);
+						sa(a, count);
 						// }
 					}
 				}
