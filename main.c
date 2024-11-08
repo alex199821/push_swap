@@ -6,7 +6,7 @@
 /*   By: auplisas <auplisas@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/03 22:33:12 by macbook           #+#    #+#             */
-/*   Updated: 2024/11/08 19:56:01 by auplisas         ###   ########.fr       */
+/*   Updated: 2024/11/08 20:48:18 by auplisas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -244,14 +244,14 @@ static void	swap(t_stack_node **stack)
 void	sa(t_stack_node **a, int *count)
 {
 	swap(a);
-	// write(1, "sa\n", 3);
+	write(1, "sa\n", 3);
 	(*count)++;
 }
 
 void	sb(t_stack_node **b, int *count)
 {
 	swap(b);
-	// write(1, "sb\n", 3);
+	write(1, "sb\n", 3);
 	(*count)++;
 }
 
@@ -259,7 +259,7 @@ void	ss(t_stack_node **a, t_stack_node **b, int *count)
 {
 	swap(a);
 	swap(b);
-	// write(1, "ss\n", 3);
+	write(1, "ss\n", 3);
 	(*count)++;
 }
 
@@ -288,14 +288,14 @@ static void	push(t_stack_node **src, t_stack_node **target)
 void	pa(t_stack_node **src, t_stack_node **target, int *count)
 {
 	push(src, target);
-	// write(1, "pa\n", 3);
+	write(1, "pa\n", 3);
 	(*count)++;
 }
 
 void	pb(t_stack_node **src, t_stack_node **target, int *count)
 {
 	push(src, target);
-	// write(1, "pb\n", 3);
+	write(1, "pb\n", 3);
 	(*count)++;
 }
 
@@ -321,14 +321,14 @@ void	ra(t_stack_node **a, int *count)
 {
 	rotate(a);
 	(*count)++;
-	// write(1, "ra\n", 3);
+	write(1, "ra\n", 3);
 }
 
 void	rb(t_stack_node **b, int *count)
 {
 	rotate(b);
 	(*count)++;
-	// write(1, "rb\n", 3);
+	write(1, "rb\n", 3);
 }
 
 void	rr(t_stack_node **a, t_stack_node **b, int *count)
@@ -336,7 +336,7 @@ void	rr(t_stack_node **a, t_stack_node **b, int *count)
 	rotate(a);
 	rotate(b);
 	(*count)++;
-	// write(1, "rr\n", 3);
+	write(1, "rr\n", 3);
 }
 
 //-------------REVERSE ROTATE-------------//
@@ -379,14 +379,14 @@ void	rra(t_stack_node **a, int *count)
 {
 	reverse_rotate(a);
 	(*count)++;
-	// write(1, "rra\n", 4);
+	write(1, "rra\n", 4);
 }
 
 void	rrb(t_stack_node **b, int *count)
 {
 	reverse_rotate(b);
 	(*count)++;
-	// write(1, "rrb\n", 4);
+	write(1, "rrb\n", 4);
 }
 
 void	rrr(t_stack_node **a, t_stack_node **b, int *count)
@@ -394,7 +394,7 @@ void	rrr(t_stack_node **a, t_stack_node **b, int *count)
 	reverse_rotate(a);
 	reverse_rotate(b);
 	(*count)++;
-	// write(1, "rrr\n", 4);
+	write(1, "rrr\n", 4);
 }
 
 //----------------------------------------//
@@ -496,7 +496,7 @@ void	small_sort(t_stack_node **stack, int *count)
 void	push_to_b(t_stack_node **a, t_stack_node **b, int *count)
 {
 	while (ft_lstsize(*a) > 3)
-		pa(a, b, count);
+		pb(a, b, count);
 }
 
 void	set_positions(t_stack_node *stack)
@@ -712,19 +712,18 @@ void	free_linked_list(t_stack_node *stack)
 	}
 }
 
-char **free_ar_of_ars(char **parentarray)
+char	**free_ar_of_ars(char **parentarray)
 {
-    int j = 0;
+	int	j;
 
-    while (parentarray[j] != NULL)
-    {
-        free(parentarray[j]);
-        j++;
-    }
-
-    free(parentarray);
-
-    return NULL;
+	j = 0;
+	while (parentarray[j] != NULL)
+	{
+		free(parentarray[j]);
+		j++;
+	}
+	free(parentarray);
+	return (NULL);
 }
 
 void	leaks(void)
@@ -873,14 +872,11 @@ bool	has_duplicates(t_stack_node *stack)
 	return (false);
 }
 
-void	initialize_and_sort(char **array)
+void	initialize_and_sort(t_stack_node **a, t_stack_node **b, char **array,
+		int *count)
 {
-	int				i;
-	t_stack_node	*a;
-	t_stack_node	*b;
+	int	i;
 
-	a = NULL;
-	b = NULL;
 	if (array)
 	{
 		i = 0;
@@ -891,36 +887,38 @@ void	initialize_and_sort(char **array)
 				write(1, "ERROR\n", 7);
 				return ;
 			}
-			add_to_end(&a, ft_atol(array[i]));
+			add_to_end(a, ft_atol(array[i]));
 			i++;
 		}
 	}
 	free_ar_of_ars(array);
-	if (has_duplicates(a))
+	if (has_duplicates(*a))
 	{
-		free_linked_list(a);
 		write(1, "ERROR\n", 7);
-		return ;
 	}
 	else
 	{
-		free_linked_list(a);
-		printf("NO ERROR LAUNCH IT");
+		sort(a, b, count);
 	}
 }
 
 int	main(int argc, char *argv[])
 {
-	char	**args;
-	int		*integers;
-	int		i;
-	bool	returned;
+	t_stack_node	*a;
+	t_stack_node	*b;
+	char			**args;
+	int				i;
+	int				count;
 
-	atexit(leaks);
+	a = NULL;
+	b = NULL;
+	count = 0;
+	// atexit(leaks);
 	i = 0;
 	if (argc < 2)
 	{
 		write(1, "ERROR\n", 7);
+		return (0);
 	}
 	else if (argc == 2)
 	{
@@ -938,48 +936,17 @@ int	main(int argc, char *argv[])
 	}
 	if (check_if_only_ints(args))
 	{
-		initialize_and_sort(args);
+		initialize_and_sort(&a, &b, args, &count);
 	}
 	else
 	{
+		free_ar_of_ars(args);
 		write(1, "ERROR\n", 7);
 	}
-	// print_arofars(args);
-	// t_stack_node	*a;
-	// t_stack_node	*b;
-	// int				count;
-	// int				i;
-	// int				numbers[] = {949924, -166623, -909966, 154379, -83097,
-	// 					-763674, -799808, 282428, -895606, 496830, 161011,
-	// 					-250742, -629003, -76255, 780886, -980214, 781814,
-	// 					983283, -117713, 545821, 562988, -842998, -916664,
-	// 					583905, 838140, 854535, -272429, 996695, 382958,
-	// 					-802632, 928153, -633574, -990296, -967775, -725642,
-	// 					-853923, -787089, 332127, 96905, -860636, 230694,
-	// 					-930587, 65838, 842095, -28349, -291665, -305289,
-	// 					551154, 352671, -953450, 303531, -677694, 377511,
-	// 					-839570, -446810, 355020, 653939, 507131, -738543,
-	// 					306224, 859025, 620407, -527255, 1000502, 316624,
-	// 					-493922, 1010707, 446134, -368792, 226827, -563896,
-	// 					683834, -878866, 295253, 838795, 887389, -36429, 288041,
-	// 					537695, -470587, -212890, 592224, 485920, 344746,
-	// 					496968, -502899, -458612, -127328, 34889, -393074,
-	// 					-84264, -101966, -691435, -963323, 909947, -206715,
-	// 					182079, -601475, 241398, -370982};
-	// a = NULL;
-	// b = NULL;
-	// count = 0;
-	// i = 0;
-	// while (i < sizeof(numbers) / sizeof(numbers[0]))
-	// {
-	// 	add_to_beginning(&a, numbers[i]);
-	// 	i++;
-	// }
-	// sort(&a, &b, &count);
 	// print_list(a);
-	// printf("COUNT: %d\n", count);
 	// printf("Is sorted: %d\n", is_sorted(a));
-	// free_linked_list(a);
+	printf("COUNT: %d\n\n\n", count);
+	free_linked_list(a);
 	return (0);
 }
 
@@ -1028,3 +995,4 @@ int	main(int argc, char *argv[])
 // rra (reverse rotate a): Shift down all elements of stack a by 1. The last element becomes the first one.
 // rrb (reverse rotate b): Shift down all elements of stack b by 1. The last element becomes the first one.
 // rrr : rra and rrb at the same time.
+
