@@ -6,7 +6,7 @@
 /*   By: auplisas <auplisas@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/03 22:33:12 by macbook           #+#    #+#             */
-/*   Updated: 2024/11/08 15:17:29 by auplisas         ###   ########.fr       */
+/*   Updated: 2024/11/08 19:56:01 by auplisas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,125 @@ typedef struct s_stack_node
 	struct s_stack_node	*prev;
 }						t_stack_node;
 
+//----------------FT_SPLIT-------------//
+
+int	is_delimiter(char c)
+{
+	int	i;
+
+	if (c == ' ')
+	{
+		i = 1;
+	}
+	else
+	{
+		i = 0;
+	}
+	return (i);
+}
+
+int	count_words(char *str)
+{
+	int	i;
+	int	count;
+	int	inword;
+
+	inword = 0;
+	count = 0;
+	i = 0;
+	while (str[i] != '\0')
+	{
+		if (i == 0 && is_delimiter(str[i]) == 0)
+		{
+			inword = 1;
+			count++;
+		}
+		else if (is_delimiter(str[i]) == 1)
+		{
+			inword = 0;
+		}
+		else if (is_delimiter(str[i]) == 0 && is_delimiter(str[i - 1]) == 1)
+		{
+			inword = 1;
+			count++;
+		}
+		i++;
+	}
+	return (count);
+}
+
+char	*copy_into_single_ar(char *str, int count, int i)
+{
+	char	*array;
+	int		j;
+
+	j = 0;
+	array = (char *)malloc((count + 1) * sizeof(char));
+	if (!array)
+		return (NULL);
+	while (j < count)
+	{
+		array[j] = (char)str[i + 1 - count + j];
+		j++;
+	}
+	array[j] = '\0';
+	return (array);
+}
+
+char	*free_all(char **ar_of_ars, int row_index)
+{
+	int	i;
+
+	i = 0;
+	while (i < row_index)
+	{
+		free(ar_of_ars[i]);
+		i++;
+	}
+	free(ar_of_ars);
+	return (NULL);
+}
+
+char	**ft_split(char *str)
+{
+	int		i;
+	int		row_index;
+	int		count;
+	int		rows;
+	char	**ar_of_ars;
+
+	i = 0;
+	row_index = 0;
+	count = 0;
+	rows = count_words(str);
+	ar_of_ars = (char **)malloc((rows + 1) * (sizeof(char *)));
+	if (!ar_of_ars)
+		return (NULL);
+	while (str[i] != '\0')
+	{
+		if (is_delimiter(str[i]) == 0)
+		{
+			count++;
+		}
+		if (is_delimiter(str[i]) == 0 && (is_delimiter(str[i + 1]) == 1 || str[i
+				+ 1] == '\0'))
+		{
+			ar_of_ars[row_index] = copy_into_single_ar(str, count, i);
+			if (ar_of_ars[row_index] == NULL)
+			{
+				free_all(ar_of_ars, row_index);
+				return (NULL);
+			}
+			count = 0;
+			row_index++;
+		}
+		i++;
+	}
+	ar_of_ars[row_index] = NULL;
+	return (ar_of_ars);
+}
+
+//----------------FT_SPLIT-------------//
 //-----------CREATE LINKED LIST-----------//
 
 t_stack_node	*create_node(int value)
@@ -62,6 +181,28 @@ void	add_to_beginning(t_stack_node **head, int value)
 		(*head)->prev = new_node;
 	}
 	*head = new_node;
+}
+
+void	add_to_end(t_stack_node **head, int value)
+{
+	t_stack_node	*new_node;
+	t_stack_node	*temp;
+
+	new_node = create_node(value);
+	if (!new_node)
+		return ;
+	if (*head == NULL)
+	{
+		*head = new_node;
+	}
+	else
+	{
+		temp = *head;
+		while (temp->next != NULL)
+			temp = temp->next;
+		temp->next = new_node;
+		new_node->prev = temp;
+	}
 }
 
 //-----------UTILS--------------//
@@ -557,12 +698,12 @@ void	print_list(t_stack_node *head)
 	printf("NULL\n");
 }
 
-void	free_linked_list(t_stack_node *head)
+void	free_linked_list(t_stack_node *stack)
 {
 	t_stack_node	*current;
 	t_stack_node	*next_node;
 
-	current = head;
+	current = stack;
 	while (current != NULL)
 	{
 		next_node = current->next;
@@ -571,13 +712,239 @@ void	free_linked_list(t_stack_node *head)
 	}
 }
 
+char **free_ar_of_ars(char **parentarray)
+{
+    int j = 0;
+
+    while (parentarray[j] != NULL)
+    {
+        free(parentarray[j]);
+        j++;
+    }
+
+    free(parentarray);
+
+    return NULL;
+}
+
 void	leaks(void)
 {
 	system("leaks a.out");
 }
 
-int	main(void)
+void	print_arofars(char **string)
 {
+	int	i;
+
+	if (string)
+	{
+		i = 0;
+		while (string[i])
+		{
+			printf("result[%d] = %s\n", i, string[i]);
+			i++;
+		}
+	}
+}
+
+//---------------ATOL---------------//
+
+int	iswhitespace(char c)
+{
+	if (c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f'
+		|| c == '\r')
+	{
+		return (1);
+	}
+	return (0);
+}
+
+long	ft_atol(const char *str)
+{
+	int		i;
+	long	res;
+	long	sign;
+
+	i = 0;
+	sign = 1;
+	res = 0;
+	while (iswhitespace(str[i]) == 1)
+		i++;
+	if (str[i] == '-')
+	{
+		sign = -1;
+		i++;
+	}
+	else if (str[i] == '+')
+	{
+		i++;
+	}
+	while (str[i] != '\0' && (str[i] <= '9' && str[i] >= '0'))
+	{
+		res = res * 10 + str[i] - '0';
+		i++;
+	}
+	return (res * sign);
+}
+
+//--------------ATOL---------------//
+
+//-------------IS NUMBER STRING -------------//
+bool	is_number_string(const char *str)
+{
+	int	i;
+
+	i = 0;
+	while (iswhitespace(str[i]) == 1)
+		i++;
+	if (str[i] == '\0')
+		return (false);
+	if (str[i] == '+' || str[i] == '-')
+		i++;
+	if (str[i] == '\0')
+		return (false);
+	while (str[i] != '\0')
+	{
+		if (str[i] < '0' || str[i] > '9')
+			return (false);
+		i++;
+	}
+	return (true);
+}
+
+bool	check_if_only_ints(char **string)
+{
+	int	i;
+
+	if (string)
+	{
+		i = 0;
+		while (string[i])
+		{
+			if (is_number_string(string[i]))
+			{
+				i++;
+			}
+			else
+			{
+				return (false);
+			}
+		}
+	}
+	return (true);
+}
+//-------------IS NUMBER STRING -------------//
+
+bool	has_minmax_int(t_stack_node *stack)
+{
+	t_stack_node	*current;
+
+	current = stack;
+	while (current != NULL)
+	{
+		if (current->value > INT_MAX || current->value < INT_MIN)
+		{
+			return (true);
+		}
+		current = current->next;
+	}
+	return (false);
+}
+
+bool	has_duplicates(t_stack_node *stack)
+{
+	t_stack_node	*current;
+	t_stack_node	*inner_current;
+
+	current = stack;
+	while (current != NULL)
+	{
+		inner_current = current->next;
+		while (inner_current != NULL)
+		{
+			if (current->value == inner_current->value)
+			{
+				return (true);
+			}
+			inner_current = inner_current->next;
+		}
+		current = current->next;
+	}
+	return (false);
+}
+
+void	initialize_and_sort(char **array)
+{
+	int				i;
+	t_stack_node	*a;
+	t_stack_node	*b;
+
+	a = NULL;
+	b = NULL;
+	if (array)
+	{
+		i = 0;
+		while (array[i])
+		{
+			if (ft_atol(array[i]) > INT_MAX || ft_atol(array[i]) < INT_MIN)
+			{
+				write(1, "ERROR\n", 7);
+				return ;
+			}
+			add_to_end(&a, ft_atol(array[i]));
+			i++;
+		}
+	}
+	free_ar_of_ars(array);
+	if (has_duplicates(a))
+	{
+		free_linked_list(a);
+		write(1, "ERROR\n", 7);
+		return ;
+	}
+	else
+	{
+		free_linked_list(a);
+		printf("NO ERROR LAUNCH IT");
+	}
+}
+
+int	main(int argc, char *argv[])
+{
+	char	**args;
+	int		*integers;
+	int		i;
+	bool	returned;
+
+	atexit(leaks);
+	i = 0;
+	if (argc < 2)
+	{
+		write(1, "ERROR\n", 7);
+	}
+	else if (argc == 2)
+	{
+		args = ft_split(argv[1]);
+	}
+	else
+	{
+		i++;
+		args = malloc((argc - 1) * sizeof(char *));
+		while (argv[i])
+		{
+			args[i - 1] = argv[i];
+			i++;
+		}
+	}
+	if (check_if_only_ints(args))
+	{
+		initialize_and_sort(args);
+	}
+	else
+	{
+		write(1, "ERROR\n", 7);
+	}
+	// print_arofars(args);
 	// t_stack_node	*a;
 	// t_stack_node	*b;
 	// int				count;
@@ -599,8 +966,6 @@ int	main(void)
 	// 					496968, -502899, -458612, -127328, 34889, -393074,
 	// 					-84264, -101966, -691435, -963323, 909947, -206715,
 	// 					182079, -601475, 241398, -370982};
-
-	// atexit(leaks);
 	// a = NULL;
 	// b = NULL;
 	// count = 0;
@@ -615,7 +980,6 @@ int	main(void)
 	// printf("COUNT: %d\n", count);
 	// printf("Is sorted: %d\n", is_sorted(a));
 	// free_linked_list(a);
-
 	return (0);
 }
 
