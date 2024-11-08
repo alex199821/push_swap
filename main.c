@@ -6,7 +6,7 @@
 /*   By: macbook <macbook@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/03 22:33:12 by macbook           #+#    #+#             */
-/*   Updated: 2024/11/07 23:27:25 by macbook          ###   ########.fr       */
+/*   Updated: 2024/11/08 01:02:22 by macbook          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -533,33 +533,60 @@ void	set_positions(t_stack_node *stack)
 	}
 }
 
+// static void	find_target(t_stack_node *a, t_stack_node *b)
+// {
+// 	t_stack_node	*current;
+// 	t_stack_node	*target_node;
+// 	int				run;
+
+// 	while (b)
+// 	{
+// 		current = a;
+// 		run = 1;
+// 		while (current && run)
+// 		{
+// 			if (current->value > b->value)
+// 			{
+// 				target_node = current;
+// 				run = 0;
+// 			}
+// 			current = current->next;
+// 		}
+// 		if (b->value > find_largest(&a)->value)
+// 			b->target = find_smallest(&a);
+// 		else
+// 			b->target = target_node;
+// 		b = b->next;
+// 	}
+// }
+
 static void	find_target(t_stack_node *a, t_stack_node *b)
 {
-	t_stack_node	*current;
+	t_stack_node	*current_a;
 	t_stack_node	*target_node;
-	int				run;
+	int				best_match_index;
 
 	while (b)
 	{
-		current = a;
-		run = 1;
-		while (current && run)
+		best_match_index = INT_MAX;
+		current_a = a;
+		while (current_a)
 		{
-			if (current->value > b->value)
+			if (current_a->value > b->value
+				&& current_a->value < best_match_index)
 			{
-				target_node = current;
-				run = 0;
+				best_match_index = current_a->value;
+				target_node = current_a;
 			}
-			current = current->next;
+			current_a = current_a->next;
 		}
-		if (b->value > find_largest(&a)->value)
+		if (INT_MAX == best_match_index)
 			b->target = find_smallest(&a);
 		else
 			b->target = target_node;
 		b = b->next;
 	}
 }
-
 
 static void	count_price(t_stack_node *a, t_stack_node *b)
 {
@@ -648,64 +675,93 @@ void	print_single_node_data(t_stack_node *head)
 		temp->price, temp->target->above_median);
 }
 
+// void	perform_operations(t_stack_node **a, t_stack_node **b,
+// 		t_stack_node *cheapest, int *count)
+// {
+// 	if (cheapest->index == 0 && cheapest->target->index == 0)
+// 		pa(b, a, count);
+// 	else if (cheapest->index == 0)
+// 	{
+// 		if (cheapest->target->above_median)
+// 			rra(a, count);
+// 		else
+// 			ra(a, count);
+// 	}
+// 	else if (cheapest->target->index == 0)
+// 	{
+// 		if (cheapest->above_median)
+// 			rrb(b, count);
+// 		else
+// 			rb(b, count);
+// 	}
+// 	else
+// 	{
+// 		if (cheapest->above_median && cheapest->target->above_median)
+// 			rrr(a, b, count);
+// 		else if (!cheapest->above_median && !cheapest->target->above_median)
+// 			rr(a, b, count);
+// 		else if (!cheapest->above_median && cheapest->target->above_median)
+// 		{
+// 			rb(b, count);
+// 			rra(a, count);
+// 		}
+// 		else if (cheapest->above_median && !cheapest->target->above_median)
+// 		{
+// 			rrb(b, count);
+// 			ra(a, count);
+// 		}
+// 	}
+// 	return ;
+// }
+
+void	rotate_target(t_stack_node **a, t_stack_node **b,
+		t_stack_node *cheapest, int *count)
+{
+	if (cheapest->target->above_median)
+		rra(a, count);
+	else
+		ra(a, count);
+}
+
+void	rotate_node(t_stack_node **a, t_stack_node **b, t_stack_node *cheapest,
+		int *count)
+{
+	if (cheapest->above_median)
+		rrb(b, count);
+	else
+		rb(b, count);
+}
+
+void	rotate_node_and_target(t_stack_node **a, t_stack_node **b,
+		t_stack_node *cheapest, int *count)
+{
+	if (cheapest->above_median && cheapest->target->above_median)
+		rrr(a, b, count);
+	else if (!cheapest->above_median && !cheapest->target->above_median)
+		rr(a, b, count);
+	else if (!cheapest->above_median && cheapest->target->above_median)
+	{
+		rb(b, count);
+		rra(a, count);
+	}
+	else if (cheapest->above_median && !cheapest->target->above_median)
+	{
+		rrb(b, count);
+		ra(a, count);
+	}
+}
+
 void	perform_operations(t_stack_node **a, t_stack_node **b,
 		t_stack_node *cheapest, int *count)
 {
-	// print_list(*a);
-	// print_list(*b);
-	// print_single_node_data(cheapest);
-	// printf("\n\n\n");
 	if (cheapest->index == 0 && cheapest->target->index == 0)
-	{
 		pa(b, a, count);
-	}
-	else if (cheapest->index == 0 && cheapest->target->index != 0)
-	{
-		if (cheapest->target->above_median == true)
-		{
-			rra(a, count);
-		}
-		else if (cheapest->target->above_median == false)
-		{
-			ra(a, count);
-		}
-	}
-	else if (cheapest->index != 0 && cheapest->target->index == 0)
-	{
-		if (cheapest->target->above_median == true)
-		{
-			rrb(b, count);
-		}
-		else if (cheapest->target->above_median == false)
-		{
-			rb(b, count);
-		}
-	}
-	else if (cheapest->index != 0 && cheapest->target->index != 0)
-	{
-		if (cheapest->above_median == true
-			&& cheapest->target->above_median == true)
-		{
-			rrr(a, b, count);
-		}
-		else if (cheapest->above_median == false
-			&& cheapest->target->above_median == false)
-		{
-			rr(a, b, count);
-		}
-		else if (cheapest->above_median == false
-			&& cheapest->target->above_median == true)
-		{
-			rb(b, count);
-			rra(a, count);
-		}
-		else if (cheapest->above_median == true
-			&& cheapest->target->above_median == false)
-		{
-			rrb(b, count);
-			ra(a, count);
-		}
-	}
+	else if (cheapest->index == 0)
+		rotate_target(a, b, cheapest, count);
+	else if (cheapest->target->index == 0)
+		rotate_node(a, b, cheapest, count);
+	else
+		rotate_node_and_target(a, b, cheapest, count);
 	return ;
 }
 
@@ -728,7 +784,7 @@ int	main(void)
 	int				count;
 	int				length;
 	int				i;
-	int				numbers[] = {-91990, 94411, 25821, -39615, 67626, -38849, -95736, -69734, -62532, -66191, -59879, 45347, -94995, 69526, -89275, 56606, 73898, 58830, 14484, -89127, 55644, 23038, -55338, -83686, 45292, -19544, -96518, 60769, 7507, 94815, 24344, 71585, -13437, 21178, -10559, 7886, 73328, 15528, 41224, -44780, 64379, 18814, 53338, -82732, -68192, -18003, -1349, -23553, 288, 61045, -82099, 84340, 55375, -84411, -77718, 23084, 6215, -43903, -44835, 61088, -46109, -99858, 60621, 37630, 98779, -99084, 21562, 87283, -32191, -3741, -72682, -59577, -99578, -83747, 68606, 80656, 99513, -1273, 47311, -29072, 26075, -96021, 71566, -90894, -29361, -36538, 63832, 88133, 5772, 80354, 92019, 59231, 56203, 20336, 32465, -60497, 39098, -87183, 24043, 11195};
+	int				numbers[] = {-491653, 78413, -498262, 257130, -267278, 419921, 359999, 394264, 312926, 99638, -133703, 263554, 320808, 409527, -208408, -79084, -2095, -108365, -469975, -469758, -247044, 25546, 489987, -60209, 267896, 91568, -471014, 416382, -367204, -47781, -214389, 152392, 494588, 397767, -449096, -205160, -145313, 442291, -444081, -99919, 439725, -216042, -264656, 131686, -453175, -247046, -430553, 106757, -139841, 319700, 284670, 127917, 61543, -374400, -205465, -196651, 307291, -209458, -303466, 238049, -389453, -387440, -15325, 465869, -195455, 366042, 420493, -235134, 331989, -157043, -57311, -464570, 75867, -187875, 440362, 434943, 436222, -139775, 492489, 408595, -375140, -225148, 490659, -224211, -332377, -334147, -136990, -214241, 146497, -118624, -105197, -466620, -264234, -54372, 306080, -396013, -257166, 16007, 458958, 228946};
 	int				list_length;
 
 	a = NULL;
