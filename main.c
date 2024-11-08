@@ -3,13 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: macbook <macbook@student.42.fr>            +#+  +:+       +#+        */
+/*   By: auplisas <auplisas@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/03 22:33:12 by macbook           #+#    #+#             */
-/*   Updated: 2024/11/08 03:03:32 by macbook          ###   ########.fr       */
+/*   Updated: 2024/11/08 15:17:29 by auplisas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <dlfcn.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -378,31 +379,30 @@ void	set_positions(t_stack_node *stack)
 	}
 }
 
-static void find_target(t_stack_node *a, t_stack_node *b)
+static void	find_target(t_stack_node *a, t_stack_node *b)
 {
-    t_stack_node *current;
-    t_stack_node *target;
+	t_stack_node	*current;
+	t_stack_node	*target;
 
-    while (b)
-    {
-        current = a;
-        target = NULL;
-        while (current)
-        {
-            if (current->value > b->value &&
-                (!target || current->value < target->value))
-            {
-                target = current;
-            }
-            current = current->next;
-        }
-        if (!target)
-            b->target = find_smallest(&a);
-        else
-            b->target = target;
-
-        b = b->next;
-    }
+	while (b)
+	{
+		current = a;
+		target = NULL;
+		while (current)
+		{
+			if (current->value > b->value && (!target
+					|| current->value < target->value))
+			{
+				target = current;
+			}
+			current = current->next;
+		}
+		if (!target)
+			b->target = find_smallest(&a);
+		else
+			b->target = target;
+		b = b->next;
+	}
 }
 
 static void	count_price(t_stack_node *a, t_stack_node *b)
@@ -557,27 +557,65 @@ void	print_list(t_stack_node *head)
 	printf("NULL\n");
 }
 
+void	free_linked_list(t_stack_node *head)
+{
+	t_stack_node	*current;
+	t_stack_node	*next_node;
+
+	current = head;
+	while (current != NULL)
+	{
+		next_node = current->next;
+		free(current);
+		current = next_node;
+	}
+}
+
+void	leaks(void)
+{
+	system("leaks a.out");
+}
+
 int	main(void)
 {
-	t_stack_node	*a;
-	t_stack_node	*b;
-	int				count;
-	int				i;
-	int				numbers[] = {949924, -166623, -909966, 154379, -83097, -763674, -799808, 282428, -895606, 496830, 161011, -250742, -629003, -76255, 780886, -980214, 781814, 983283, -117713, 545821, 562988, -842998, -916664, 583905, 838140, 854535, -272429, 996695, 382958, -802632, 928153, -633574, -990296, -967775, -725642, -853923, -787089, 332127, 96905, -860636, 230694, -930587, 65838, 842095, -28349, -291665, -305289, 551154, 352671, -953450, 303531, -677694, 377511, -839570, -446810, 355020, 653939, 507131, -738543, 306224, 859025, 620407, -527255, 1000502, 316624, -493922, 1010707, 446134, -368792, 226827, -563896, 683834, -878866, 295253, 838795, 887389, -36429, 288041, 537695, -470587, -212890, 592224, 485920, 344746, 496968, -502899, -458612, -127328, 34889, -393074, -84264, -101966, -691435, -963323, 909947, -206715, 182079, -601475, 241398, -370982};
+	// t_stack_node	*a;
+	// t_stack_node	*b;
+	// int				count;
+	// int				i;
+	// int				numbers[] = {949924, -166623, -909966, 154379, -83097,
+	// 					-763674, -799808, 282428, -895606, 496830, 161011,
+	// 					-250742, -629003, -76255, 780886, -980214, 781814,
+	// 					983283, -117713, 545821, 562988, -842998, -916664,
+	// 					583905, 838140, 854535, -272429, 996695, 382958,
+	// 					-802632, 928153, -633574, -990296, -967775, -725642,
+	// 					-853923, -787089, 332127, 96905, -860636, 230694,
+	// 					-930587, 65838, 842095, -28349, -291665, -305289,
+	// 					551154, 352671, -953450, 303531, -677694, 377511,
+	// 					-839570, -446810, 355020, 653939, 507131, -738543,
+	// 					306224, 859025, 620407, -527255, 1000502, 316624,
+	// 					-493922, 1010707, 446134, -368792, 226827, -563896,
+	// 					683834, -878866, 295253, 838795, 887389, -36429, 288041,
+	// 					537695, -470587, -212890, 592224, 485920, 344746,
+	// 					496968, -502899, -458612, -127328, 34889, -393074,
+	// 					-84264, -101966, -691435, -963323, 909947, -206715,
+	// 					182079, -601475, 241398, -370982};
 
-	a = NULL;
-	b = NULL;
-	count = 0;
-	i = 0;
-	while (i < sizeof(numbers) / sizeof(numbers[0]))
-	{
-		add_to_beginning(&a, numbers[i]);
-		i++;
-	}
-	sort(&a, &b, &count);
-	print_list(a);
-	printf("COUNT: %d\n", count);
-	printf("Is sorted: %d\n", is_sorted(a));
+	// atexit(leaks);
+	// a = NULL;
+	// b = NULL;
+	// count = 0;
+	// i = 0;
+	// while (i < sizeof(numbers) / sizeof(numbers[0]))
+	// {
+	// 	add_to_beginning(&a, numbers[i]);
+	// 	i++;
+	// }
+	// sort(&a, &b, &count);
+	// print_list(a);
+	// printf("COUNT: %d\n", count);
+	// printf("Is sorted: %d\n", is_sorted(a));
+	// free_linked_list(a);
+
 	return (0);
 }
 
