@@ -1,3 +1,6 @@
 .DS_STORE
 *a.out
 .vscode/
+checker_Mac
+*txt
+push_swap

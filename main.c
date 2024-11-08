@@ -6,7 +6,7 @@
 /*   By: auplisas <auplisas@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/03 22:33:12 by macbook           #+#    #+#             */
-/*   Updated: 2024/11/08 20:48:18 by auplisas         ###   ########.fr       */
+/*   Updated: 2024/11/08 22:43:49 by auplisas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,122 +29,212 @@ typedef struct s_stack_node
 	struct s_stack_node	*prev;
 }						t_stack_node;
 
-//----------------FT_SPLIT-------------//
+//---------------LIBT FT--------------//
 
-int	is_delimiter(char c)
+size_t	ft_strlen(const char *c)
 {
-	int	i;
+	size_t	i;
 
-	if (c == ' ')
+	i = 0;
+	while (c[i] != '\0')
 	{
-		i = 1;
-	}
-	else
-	{
-		i = 0;
+		i++;
 	}
 	return (i);
 }
 
-int	count_words(char *str)
+void	*ft_memmove(void *dst, const void *src, size_t n)
 {
-	int	i;
-	int	count;
-	int	inword;
+	char		*ptr1;
+	const char	*ptr2;
 
-	inword = 0;
-	count = 0;
-	i = 0;
-	while (str[i] != '\0')
+	ptr1 = dst;
+	ptr2 = src;
+	if (!dst && !src)
+		return (NULL);
+	if (dst < src)
 	{
-		if (i == 0 && is_delimiter(str[i]) == 0)
+		while (n--)
 		{
-			inword = 1;
-			count++;
+			*ptr1++ = *ptr2++;
 		}
-		else if (is_delimiter(str[i]) == 1)
-		{
-			inword = 0;
-		}
-		else if (is_delimiter(str[i]) == 0 && is_delimiter(str[i - 1]) == 1)
-		{
-			inword = 1;
-			count++;
-		}
-		i++;
 	}
-	return (count);
+	else
+	{
+		while (n--)
+		{
+			ptr1[n] = ptr2[n];
+		}
+	}
+	return (dst);
 }
 
-char	*copy_into_single_ar(char *str, int count, int i)
+void	*ft_memcpy(void *dst, const void *src, size_t n)
+{
+	char	*ptr1;
+	char	*ptr2;
+
+	if (!dst && !src)
+	{
+		return (NULL);
+	}
+	ptr1 = (char *)dst;
+	ptr2 = (char *)src;
+	while (n--)
+	{
+		*ptr1 = *ptr2;
+		ptr1++;
+		ptr2++;
+	}
+	return (dst);
+}
+
+void	*ft_memset(void *s, int c, size_t n)
+{
+	unsigned char	*ptr;
+
+	ptr = (unsigned char *)s;
+	while (n--)
+	{
+		*ptr = (unsigned char)c;
+		ptr++;
+	}
+	return (s);
+}
+
+void	*ft_calloc(size_t count, size_t size)
 {
 	char	*array;
-	int		j;
+	size_t	totalsize;
 
-	j = 0;
-	array = (char *)malloc((count + 1) * sizeof(char));
-	if (!array)
-		return (NULL);
-	while (j < count)
+	totalsize = count * size;
+	array = (char *)malloc(totalsize);
+	if (array == NULL)
 	{
-		array[j] = (char)str[i + 1 - count + j];
-		j++;
+		return (NULL);
 	}
-	array[j] = '\0';
+	ft_memset(array, '\0', totalsize);
 	return (array);
 }
 
-char	*free_all(char **ar_of_ars, int row_index)
+char	*ft_strdup(const char *src)
 {
+	size_t	i;
+	char	*array;
+
+	i = ft_strlen(src);
+	array = (char *)ft_calloc(i + 1, sizeof(char));
+	if (array == NULL)
+	{
+		return (NULL);
+	}
+	ft_memmove(array, src, i + 1);
+	return (array);
+}
+
+//----------------FT_SPLIT-------------//
+
+int	countrows(char const *src, char delimiter)
+{
+	int	count;
+	int	inrow;
 	int	i;
 
+	count = 0;
+	inrow = 0;
 	i = 0;
-	while (i < row_index)
+	while (src[i] != '\0')
 	{
-		free(ar_of_ars[i]);
+		if (src[i] == delimiter)
+		{
+			if (inrow)
+			{
+				count++;
+				inrow = 0;
+			}
+		}
+		else
+			inrow = 1;
 		i++;
 	}
-	free(ar_of_ars);
+	if (inrow)
+		count++;
+	return (count);
+}
+
+char	**free_all(char **parentarray, int arrayindex)
+{
+	int	j;
+
+	j = 0;
+	while (j < arrayindex)
+	{
+		free(parentarray[j]);
+		j++;
+	}
+	free(parentarray);
 	return (NULL);
 }
 
-char	**ft_split(char *str)
+char	*allocate_and_copy(const char *s, int startindex, int count)
 {
-	int		i;
-	int		row_index;
-	int		count;
-	int		rows;
-	char	**ar_of_ars;
+	char	*subarray;
+
+	subarray = (char *)malloc(sizeof(char) * (count + 1));
+	if (subarray == NULL)
+		return (NULL);
+	ft_memcpy(subarray, &s[startindex], count);
+	subarray[count] = '\0';
+	return (subarray);
+}
+
+char	**str_div_logic(char **parentarray, const char *s, char c, int ar_index)
+{
+	int	i;
+	int	count;
+	int	startindex;
 
 	i = 0;
-	row_index = 0;
 	count = 0;
-	rows = count_words(str);
-	ar_of_ars = (char **)malloc((rows + 1) * (sizeof(char *)));
-	if (!ar_of_ars)
-		return (NULL);
-	while (str[i] != '\0')
+	while (s[i] != '\0')
 	{
-		if (is_delimiter(str[i]) == 0)
+		if (s[i] != c)
 		{
-			count++;
-		}
-		if (is_delimiter(str[i]) == 0 && (is_delimiter(str[i + 1]) == 1 || str[i
-				+ 1] == '\0'))
-		{
-			ar_of_ars[row_index] = copy_into_single_ar(str, count, i);
-			if (ar_of_ars[row_index] == NULL)
-			{
-				free_all(ar_of_ars, row_index);
-				return (NULL);
-			}
+			startindex = i;
+			while (s[i] != '\0' && s[i++] != c)
+				count++;
+			parentarray[ar_index] = allocate_and_copy(s, startindex, count);
+			if (parentarray[ar_index++] == NULL)
+				return (free_all(parentarray, ar_index));
 			count = 0;
-			row_index++;
 		}
-		i++;
+		else
+			i++;
 	}
-	ar_of_ars[row_index] = NULL;
-	return (ar_of_ars);
+	return (parentarray);
+}
+
+char	**ft_split(char const *s, char c)
+{
+	char	**parentarray;
+	int		ar_index;
+
+	if (s == NULL)
+	{
+		return (NULL);
+	}
+	ar_index = 0;
+	parentarray = (char **)malloc(sizeof(char *) * (countrows(s, c) + 1));
+	if (parentarray == NULL)
+	{
+		return (NULL);
+	}
+	if (str_div_logic(parentarray, s, c, ar_index) == NULL)
+	{
+		return (NULL);
+	}
+	parentarray[countrows(s, c)] = NULL;
+	return (parentarray);
 }
 
 //----------------FT_SPLIT-------------//
@@ -241,26 +331,23 @@ static void	swap(t_stack_node **stack)
 	*stack = second_node;
 }
 
-void	sa(t_stack_node **a, int *count)
+void	sa(t_stack_node **a)
 {
 	swap(a);
 	write(1, "sa\n", 3);
-	(*count)++;
 }
 
-void	sb(t_stack_node **b, int *count)
+void	sb(t_stack_node **b)
 {
 	swap(b);
 	write(1, "sb\n", 3);
-	(*count)++;
 }
 
-void	ss(t_stack_node **a, t_stack_node **b, int *count)
+void	ss(t_stack_node **a, t_stack_node **b)
 {
 	swap(a);
 	swap(b);
 	write(1, "ss\n", 3);
-	(*count)++;
 }
 
 //-------------PUSH-------------//
@@ -285,18 +372,16 @@ static void	push(t_stack_node **src, t_stack_node **target)
 	}
 }
 
-void	pa(t_stack_node **src, t_stack_node **target, int *count)
+void	pa(t_stack_node **src, t_stack_node **target)
 {
 	push(src, target);
 	write(1, "pa\n", 3);
-	(*count)++;
 }
 
-void	pb(t_stack_node **src, t_stack_node **target, int *count)
+void	pb(t_stack_node **src, t_stack_node **target)
 {
 	push(src, target);
 	write(1, "pb\n", 3);
-	(*count)++;
 }
 
 //-------------ROTATE-------------//
@@ -317,25 +402,22 @@ static void	rotate(t_stack_node **stack)
 	first_node->next = NULL;
 }
 
-void	ra(t_stack_node **a, int *count)
+void	ra(t_stack_node **a)
 {
 	rotate(a);
-	(*count)++;
 	write(1, "ra\n", 3);
 }
 
-void	rb(t_stack_node **b, int *count)
+void	rb(t_stack_node **b)
 {
 	rotate(b);
-	(*count)++;
 	write(1, "rb\n", 3);
 }
 
-void	rr(t_stack_node **a, t_stack_node **b, int *count)
+void	rr(t_stack_node **a, t_stack_node **b)
 {
 	rotate(a);
 	rotate(b);
-	(*count)++;
 	write(1, "rr\n", 3);
 }
 
@@ -375,25 +457,22 @@ static void	reverse_rotate(t_stack_node **stack)
 	*stack = last_node;
 }
 
-void	rra(t_stack_node **a, int *count)
+void	rra(t_stack_node **a)
 {
 	reverse_rotate(a);
-	(*count)++;
 	write(1, "rra\n", 4);
 }
 
-void	rrb(t_stack_node **b, int *count)
+void	rrb(t_stack_node **b)
 {
 	reverse_rotate(b);
-	(*count)++;
 	write(1, "rrb\n", 4);
 }
 
-void	rrr(t_stack_node **a, t_stack_node **b, int *count)
+void	rrr(t_stack_node **a, t_stack_node **b)
 {
 	reverse_rotate(a);
 	reverse_rotate(b);
-	(*count)++;
 	write(1, "rrr\n", 4);
 }
 
@@ -412,17 +491,6 @@ int	ft_lstsize(t_stack_node *stack)
 		i++;
 	}
 	return (i);
-}
-
-int	is_sorted(t_stack_node *stack)
-{
-	while (stack && stack->next)
-	{
-		if (stack->value > stack->next->value)
-			return (0);
-		stack = stack->next;
-	}
-	return (1);
 }
 
 t_stack_node	*find_largest(t_stack_node **stack)
@@ -479,24 +547,24 @@ t_stack_node	*find_smallest(t_stack_node **stack)
 	return (smallest);
 }
 
-void	small_sort(t_stack_node **stack, int *count)
+void	small_sort(t_stack_node **stack)
 {
 	t_stack_node	*largest;
 	int				list_length;
 
 	largest = find_largest(stack);
 	if (*stack == largest)
-		ra(stack, count);
+		ra(stack);
 	else if ((*stack)->next == largest)
-		rra(stack, count);
+		rra(stack);
 	if ((*stack)->value > (*stack)->next->value)
-		sa(stack, count);
+		sa(stack);
 }
 
-void	push_to_b(t_stack_node **a, t_stack_node **b, int *count)
+void	push_to_b(t_stack_node **a, t_stack_node **b)
 {
 	while (ft_lstsize(*a) > 3)
-		pb(a, b, count);
+		pb(a, b);
 }
 
 void	set_positions(t_stack_node *stack)
@@ -591,58 +659,57 @@ t_stack_node	*find_cheapest(t_stack_node **stack)
 ///--------------------ROTATION OPERATIONS-------------------//
 
 void	rotate_target(t_stack_node **a, t_stack_node **b,
-		t_stack_node *cheapest, int *count)
+		t_stack_node *cheapest)
 {
 	if (cheapest->target->above_median)
-		rra(a, count);
+		rra(a);
 	else
-		ra(a, count);
+		ra(a);
 }
 
-void	rotate_node(t_stack_node **a, t_stack_node **b, t_stack_node *cheapest,
-		int *count)
+void	rotate_node(t_stack_node **a, t_stack_node **b, t_stack_node *cheapest)
 {
 	if (cheapest->above_median)
-		rrb(b, count);
+		rrb(b);
 	else
-		rb(b, count);
+		rb(b);
 }
 
 void	rotate_node_and_target(t_stack_node **a, t_stack_node **b,
-		t_stack_node *cheapest, int *count)
+		t_stack_node *cheapest)
 {
 	if (cheapest->above_median && cheapest->target->above_median)
-		rrr(a, b, count);
+		rrr(a, b);
 	else if (!cheapest->above_median && !cheapest->target->above_median)
-		rr(a, b, count);
+		rr(a, b);
 	else if (!cheapest->above_median && cheapest->target->above_median)
 	{
-		rb(b, count);
-		rra(a, count);
+		rb(b);
+		rra(a);
 	}
 	else if (cheapest->above_median && !cheapest->target->above_median)
 	{
-		rrb(b, count);
-		ra(a, count);
+		rrb(b);
+		ra(a);
 	}
 }
 
 void	perform_operations(t_stack_node **a, t_stack_node **b,
-		t_stack_node *cheapest, int *count)
+		t_stack_node *cheapest)
 {
 	if (cheapest->index == 0 && cheapest->target->index == 0)
-		pa(b, a, count);
+		pa(b, a);
 	else if (cheapest->index == 0)
-		rotate_target(a, b, cheapest, count);
+		rotate_target(a, b, cheapest);
 	else if (cheapest->target->index == 0)
-		rotate_node(a, b, cheapest, count);
+		rotate_node(a, b, cheapest);
 	else
-		rotate_node_and_target(a, b, cheapest, count);
+		rotate_node_and_target(a, b, cheapest);
 	return ;
 }
 ///--------------------ROTATION OPERATIONS-------------------//
 
-void	push_swap(t_stack_node **a, t_stack_node **b, int *count)
+void	push_swap(t_stack_node **a, t_stack_node **b)
 {
 	t_stack_node	*cheapest;
 
@@ -651,51 +718,37 @@ void	push_swap(t_stack_node **a, t_stack_node **b, int *count)
 	find_target(*a, *b);
 	count_price(*a, *b);
 	cheapest = find_cheapest(b);
-	perform_operations(a, b, cheapest, count);
+	perform_operations(a, b, cheapest);
 }
 
-void	sort_large(t_stack_node **a, t_stack_node **b, int list_length,
-		int *count)
+void	sort_large(t_stack_node **a, t_stack_node **b, int list_length)
 {
-	small_sort(a, count);
+	small_sort(a);
 	while (ft_lstsize(*a) < list_length)
 	{
-		push_swap(a, b, count);
+		push_swap(a, b);
 	}
 	while ((*a)->value != find_smallest(a)->value)
 	{
 		if (find_smallest(a)->above_median == true)
-			rra(a, count);
+			rra(a);
 		else
-			ra(a, count);
+			ra(a);
 	}
 }
 
-void	sort(t_stack_node **a, t_stack_node **b, int *count)
+void	sort(t_stack_node **a, t_stack_node **b)
 {
 	int	list_length;
 
 	list_length = ft_lstsize(*a);
 	if (list_length <= 3)
-		small_sort(a, count);
+		small_sort(a);
 	else
 	{
-		push_to_b(a, b, count);
-		sort_large(a, b, list_length, count);
+		push_to_b(a, b);
+		sort_large(a, b, list_length);
 	}
-}
-
-void	print_list(t_stack_node *head)
-{
-	t_stack_node	*temp;
-
-	temp = head;
-	while (temp != NULL)
-	{
-		printf("%d, ", temp->value);
-		temp = temp->next;
-	}
-	printf("NULL\n");
 }
 
 void	free_linked_list(t_stack_node *stack)
@@ -717,6 +770,8 @@ char	**free_ar_of_ars(char **parentarray)
 	int	j;
 
 	j = 0;
+	if (parentarray == NULL)
+		return (NULL);
 	while (parentarray[j] != NULL)
 	{
 		free(parentarray[j]);
@@ -728,7 +783,7 @@ char	**free_ar_of_ars(char **parentarray)
 
 void	leaks(void)
 {
-	system("leaks a.out");
+	system("leaks push_swap");
 }
 
 void	print_arofars(char **string)
@@ -872,8 +927,7 @@ bool	has_duplicates(t_stack_node *stack)
 	return (false);
 }
 
-void	initialize_and_sort(t_stack_node **a, t_stack_node **b, char **array,
-		int *count)
+int	initialize_and_sort(t_stack_node **a, t_stack_node **b, char **array)
 {
 	int	i;
 
@@ -883,23 +937,45 @@ void	initialize_and_sort(t_stack_node **a, t_stack_node **b, char **array,
 		while (array[i])
 		{
 			if (ft_atol(array[i]) > INT_MAX || ft_atol(array[i]) < INT_MIN)
-			{
-				write(1, "ERROR\n", 7);
-				return ;
-			}
+				return (free_ar_of_ars(array), write(2, "ERROR\n", 7), 1);
 			add_to_end(a, ft_atol(array[i]));
 			i++;
 		}
 	}
 	free_ar_of_ars(array);
 	if (has_duplicates(*a))
-	{
-		write(1, "ERROR\n", 7);
-	}
+		return (write(2, "ERROR\n", 7), 1);
 	else
+		sort(a, b);
+	return (0);
+}
+
+char	**arrange_args_inar(int argc, char **argv)
+{
+	char	**args;
+	int i;
+	
+	args = malloc(argc * sizeof(char *));
+	i = 0;
+	if (!args)
 	{
-		sort(a, b, count);
+		write(2, "ERROR\n", 7);
+		return (NULL);
 	}
+	i++;
+	while (argv[i])
+	{
+		args[i - 1] = ft_strdup(argv[i]);
+		if (!args[i - 1])
+		{
+			free_ar_of_ars(args);
+			write(2, "ERROR\n", 7);
+			return (NULL);
+		}
+		i++;
+	}
+	args[i - 1] = NULL;
+	return (args);
 }
 
 int	main(int argc, char *argv[])
@@ -908,47 +984,52 @@ int	main(int argc, char *argv[])
 	t_stack_node	*b;
 	char			**args;
 	int				i;
-	int				count;
 
 	a = NULL;
 	b = NULL;
-	count = 0;
 	// atexit(leaks);
 	i = 0;
 	if (argc < 2)
-	{
-		write(1, "ERROR\n", 7);
-		return (0);
-	}
+		return (write(2, "ERROR\n", 7), 1);
 	else if (argc == 2)
-	{
-		args = ft_split(argv[1]);
-	}
+		args = ft_split(argv[1], ' ');
 	else
 	{
-		i++;
-		args = malloc((argc - 1) * sizeof(char *));
-		while (argv[i])
-		{
-			args[i - 1] = argv[i];
-			i++;
-		}
+		args = arrange_args_inar(argc, argv);
+		if (!args)
+			return (write(2, "ERROR\n", 7), 1);
 	}
 	if (check_if_only_ints(args))
-	{
-		initialize_and_sort(&a, &b, args, &count);
-	}
+		return (initialize_and_sort(&a, &b, args));
 	else
-	{
-		free_ar_of_ars(args);
-		write(1, "ERROR\n", 7);
-	}
-	// print_list(a);
-	// printf("Is sorted: %d\n", is_sorted(a));
-	printf("COUNT: %d\n\n\n", count);
+		return (free_ar_of_ars(args), write(2, "ERROR\n", 7), 1);
 	free_linked_list(a);
 	return (0);
 }
+
+// int	is_sorted(t_stack_node *stack)
+// {
+// 	while (stack && stack->next)
+// 	{
+// 		if (stack->value > stack->next->value)
+// 			return (0);
+// 		stack = stack->next;
+// 	}
+// 	return (1);
+// }
+
+// void	print_list(t_stack_node *head)
+// {
+// 	t_stack_node	*temp;
+
+// 	temp = head;
+// 	while (temp != NULL)
+// 	{
+// 		printf("%d, ", temp->value);
+// 		temp = temp->next;
+// 	}
+// 	printf("NULL\n");
+// }
 
 // void	print_node_data(t_stack_node *head)
 // {
@@ -995,4 +1076,3 @@ int	main(int argc, char *argv[])
 // rra (reverse rotate a): Shift down all elements of stack a by 1. The last element becomes the first one.
 // rrb (reverse rotate b): Shift down all elements of stack b by 1. The last element becomes the first one.
 // rrr : rra and rrb at the same time.
-
