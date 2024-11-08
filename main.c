@@ -6,7 +6,7 @@
 /*   By: macbook <macbook@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/03 22:33:12 by macbook           #+#    #+#             */
-/*   Updated: 2024/11/08 01:02:22 by macbook          ###   ########.fr       */
+/*   Updated: 2024/11/08 03:03:32 by macbook          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,87 +27,6 @@ typedef struct s_stack_node
 	struct s_stack_node	*next;
 	struct s_stack_node	*prev;
 }						t_stack_node;
-
-////TESSSSSSSSSSSSSTTTTTTTT//
-
-// Function to count the number of nodes in the linked list
-int	count_nodes(t_stack_node *head)
-{
-	int	count;
-
-	count = 0;
-	while (head)
-	{
-		count++;
-		head = head->next;
-	}
-	return (count);
-}
-
-// Function to convert the linked list to an array
-int	*list_to_array(t_stack_node *head, int length)
-{
-	int	*array;
-
-	array = malloc(length * sizeof(int));
-	if (!array)
-		return (NULL);
-	for (int i = 0; i < length; i++)
-	{
-		array[i] = head->value;
-		head = head->next;
-	}
-	return (array);
-}
-
-// Simple bubble sort function
-void	bubble_sort(int *array, int length)
-{
-	int	temp;
-
-	for (int i = 0; i < length - 1; i++)
-	{
-		for (int j = 0; j < length - i - 1; j++)
-		{
-			if (array[j] > array[j + 1])
-			{
-				temp = array[j];
-				array[j] = array[j + 1];
-				array[j + 1] = temp;
-			}
-		}
-	}
-}
-
-// Function to find the median value of the linked list
-int	find_median(t_stack_node *head)
-{
-	int	length;
-	int	*array;
-	int	median;
-
-	length = count_nodes(head);
-	if (length == 0)
-		return (0); // or handle empty list case appropriately
-	array = list_to_array(head, length);
-	if (!array)
-		return (0); // or handle memory allocation failure
-	bubble_sort(array, length);
-	// Calculate the median
-	if (length % 2 == 0)
-	{
-		// Even number of elements
-		median = (array[length / 2 - 1] + array[length / 2]) / 2;
-	}
-	else
-	{
-		// Odd number of elements
-		median = array[length / 2];
-	}
-	free(array); // Don't forget to free the allocated memory
-	return (median);
-}
-//////////////////////////////////////////
 
 //-----------CREATE LINKED LIST-----------//
 
@@ -144,42 +63,8 @@ void	add_to_beginning(t_stack_node **head, int value)
 	*head = new_node;
 }
 
-void	add_to_end(t_stack_node **head, int value)
-{
-	t_stack_node	*new_node;
-	t_stack_node	*temp;
-
-	new_node = create_node(value);
-	if (!new_node)
-		return ;
-	if (*head == NULL)
-	{
-		*head = new_node;
-	}
-	else
-	{
-		temp = *head;
-		while (temp->next != NULL)
-			temp = temp->next;
-		temp->next = new_node;
-		new_node->prev = temp;
-	}
-}
-
-void	print_list(t_stack_node *head)
-{
-	t_stack_node	*temp;
-
-	temp = head;
-	while (temp != NULL)
-	{
-		printf("%d, ", temp->value);
-		temp = temp->next;
-	}
-	printf("NULL\n");
-}
-
 //-----------UTILS--------------//
+
 t_stack_node	*remove_from_beginning(t_stack_node **head)
 {
 	t_stack_node	*removed_node;
@@ -406,9 +291,7 @@ t_stack_node	*find_largest(t_stack_node **stack)
 
 	i = 0;
 	if (!stack)
-	{
 		return (NULL);
-	}
 	current = *stack;
 	largest = *stack;
 	largest->index = 0;
@@ -471,38 +354,8 @@ void	small_sort(t_stack_node **stack, int *count)
 void	push_to_b(t_stack_node **a, t_stack_node **b, int *count)
 {
 	while (ft_lstsize(*a) > 3)
-	{
 		pa(a, b, count);
-	}
 }
-
-// static void	find_target(t_stack_node *a, t_stack_node *b)
-// {
-// 	t_stack_node	*current_a;
-// 	t_stack_node	*target_node;
-// 	int				best_match_index;
-
-// 	while (b)
-// 	{
-// 		best_match_index = INT_MAX;
-// 		current_a = a;
-// 		while (current_a)
-// 		{
-// 			if (current_a->value > b->value
-// 				&& current_a->value < best_match_index)
-// 			{
-// 				best_match_index = current_a->value;
-// 				target_node = current_a;
-// 			}
-// 			current_a = current_a->next;
-// 		}
-// 		if (INT_MAX == best_match_index)
-// 			b->target = find_smallest(&a);
-// 		else
-// 			b->target = target_node;
-// 		b = b->next;
-// 	}
-// }
 
 void	set_positions(t_stack_node *stack)
 {
@@ -512,14 +365,6 @@ void	set_positions(t_stack_node *stack)
 	i = 0;
 	if (!stack)
 		return ;
-	// if (ft_lstsize(stack) % 2 == 0)
-	// {
-	// 	median_index = ft_lstsize(stack) / 2 + 1;
-	// }
-	// else
-	// {
-	// 	median_index = ft_lstsize(stack) / 2;
-	// }
 	median_index = ft_lstsize(stack) / 2;
 	while (stack)
 	{
@@ -533,59 +378,31 @@ void	set_positions(t_stack_node *stack)
 	}
 }
 
-// static void	find_target(t_stack_node *a, t_stack_node *b)
-// {
-// 	t_stack_node	*current;
-// 	t_stack_node	*target_node;
-// 	int				run;
-
-// 	while (b)
-// 	{
-// 		current = a;
-// 		run = 1;
-// 		while (current && run)
-// 		{
-// 			if (current->value > b->value)
-// 			{
-// 				target_node = current;
-// 				run = 0;
-// 			}
-// 			current = current->next;
-// 		}
-// 		if (b->value > find_largest(&a)->value)
-// 			b->target = find_smallest(&a);
-// 		else
-// 			b->target = target_node;
-// 		b = b->next;
-// 	}
-// }
-
-static void	find_target(t_stack_node *a, t_stack_node *b)
+static void find_target(t_stack_node *a, t_stack_node *b)
 {
-	t_stack_node	*current_a;
-	t_stack_node	*target_node;
-	int				best_match_index;
+    t_stack_node *current;
+    t_stack_node *target;
 
-	while (b)
-	{
-		best_match_index = INT_MAX;
-		current_a = a;
-		while (current_a)
-		{
-			if (current_a->value > b->value
-				&& current_a->value < best_match_index)
-			{
-				best_match_index = current_a->value;
-				target_node = current_a;
-			}
-			current_a = current_a->next;
-		}
-		if (INT_MAX == best_match_index)
-			b->target = find_smallest(&a);
-		else
-			b->target = target_node;
-		b = b->next;
-	}
+    while (b)
+    {
+        current = a;
+        target = NULL;
+        while (current)
+        {
+            if (current->value > b->value &&
+                (!target || current->value < target->value))
+            {
+                target = current;
+            }
+            current = current->next;
+        }
+        if (!target)
+            b->target = find_smallest(&a);
+        else
+            b->target = target;
+
+        b = b->next;
+    }
 }
 
 static void	count_price(t_stack_node *a, t_stack_node *b)
@@ -599,22 +416,14 @@ static void	count_price(t_stack_node *a, t_stack_node *b)
 	while (b)
 	{
 		price = 0;
-		if (b->above_median == true && b->target->above_median == true)
-		{
+		if (b->above_median && b->target->above_median)
 			price = (size_b - b->index) + (size_a - b->target->index);
-		}
-		else if (b->above_median == false && b->target->above_median == true)
-		{
+		else if (!b->above_median && b->target->above_median)
 			price = (b->index) + (size_a - b->target->index);
-		}
-		else if (b->above_median == true && b->target->above_median == false)
-		{
+		else if (b->above_median && !b->target->above_median)
 			price = (size_b - b->index) + (b->target->index);
-		}
-		else if (b->above_median == false && b->target->above_median == false)
-		{
+		else if (!b->above_median && !b->target->above_median)
 			price = (b->index) + (b->target->index);
-		}
 		b->price = price;
 		b = b->next;
 	}
@@ -626,93 +435,19 @@ t_stack_node	*find_cheapest(t_stack_node **stack)
 	t_stack_node	*cheapest;
 
 	if (!stack)
-	{
 		return (NULL);
-	}
 	current = *stack;
 	cheapest = *stack;
 	while (current)
 	{
 		if (current->price < cheapest->price)
-		{
 			cheapest = current;
-		}
 		current = current->next;
 	}
 	return (cheapest);
 }
 
-void	print_node_data(t_stack_node *head)
-{
-	t_stack_node	*temp;
-
-	temp = head;
-	while (temp != NULL)
-	{
-		printf("Node Value is: %d, Node's Index is: %d, ", temp->value,
-			temp->index);
-		printf("and its above median: %d\n", temp->above_median);
-		printf("Its Target is: %d, Its Target index is: %d, ",
-			temp->target->value, temp->target->index);
-		printf("price to push is: %d, and its target above median: %d\n\n\n",
-			temp->price, temp->target->above_median);
-		temp = temp->next;
-	}
-	printf("NULL\n");
-}
-
-void	print_single_node_data(t_stack_node *head)
-{
-	t_stack_node	*temp;
-
-	temp = head;
-	printf("Node Value is: %d, Node's Index is: %d, ", temp->value,
-		temp->index);
-	printf("and its above median: %d\n", temp->above_median);
-	printf("Its Target is: %d, Its Target index is: %d, ", temp->target->value,
-		temp->target->index);
-	printf("price to push is: %d, and its target above median: %d\n\n\n",
-		temp->price, temp->target->above_median);
-}
-
-// void	perform_operations(t_stack_node **a, t_stack_node **b,
-// 		t_stack_node *cheapest, int *count)
-// {
-// 	if (cheapest->index == 0 && cheapest->target->index == 0)
-// 		pa(b, a, count);
-// 	else if (cheapest->index == 0)
-// 	{
-// 		if (cheapest->target->above_median)
-// 			rra(a, count);
-// 		else
-// 			ra(a, count);
-// 	}
-// 	else if (cheapest->target->index == 0)
-// 	{
-// 		if (cheapest->above_median)
-// 			rrb(b, count);
-// 		else
-// 			rb(b, count);
-// 	}
-// 	else
-// 	{
-// 		if (cheapest->above_median && cheapest->target->above_median)
-// 			rrr(a, b, count);
-// 		else if (!cheapest->above_median && !cheapest->target->above_median)
-// 			rr(a, b, count);
-// 		else if (!cheapest->above_median && cheapest->target->above_median)
-// 		{
-// 			rb(b, count);
-// 			rra(a, count);
-// 		}
-// 		else if (cheapest->above_median && !cheapest->target->above_median)
-// 		{
-// 			rrb(b, count);
-// 			ra(a, count);
-// 		}
-// 	}
-// 	return ;
-// }
+///--------------------ROTATION OPERATIONS-------------------//
 
 void	rotate_target(t_stack_node **a, t_stack_node **b,
 		t_stack_node *cheapest, int *count)
@@ -764,6 +499,7 @@ void	perform_operations(t_stack_node **a, t_stack_node **b,
 		rotate_node_and_target(a, b, cheapest, count);
 	return ;
 }
+///--------------------ROTATION OPERATIONS-------------------//
 
 void	push_swap(t_stack_node **a, t_stack_node **b, int *count)
 {
@@ -777,52 +513,106 @@ void	push_swap(t_stack_node **a, t_stack_node **b, int *count)
 	perform_operations(a, b, cheapest, count);
 }
 
+void	sort_large(t_stack_node **a, t_stack_node **b, int list_length,
+		int *count)
+{
+	small_sort(a, count);
+	while (ft_lstsize(*a) < list_length)
+	{
+		push_swap(a, b, count);
+	}
+	while ((*a)->value != find_smallest(a)->value)
+	{
+		if (find_smallest(a)->above_median == true)
+			rra(a, count);
+		else
+			ra(a, count);
+	}
+}
+
+void	sort(t_stack_node **a, t_stack_node **b, int *count)
+{
+	int	list_length;
+
+	list_length = ft_lstsize(*a);
+	if (list_length <= 3)
+		small_sort(a, count);
+	else
+	{
+		push_to_b(a, b, count);
+		sort_large(a, b, list_length, count);
+	}
+}
+
+void	print_list(t_stack_node *head)
+{
+	t_stack_node	*temp;
+
+	temp = head;
+	while (temp != NULL)
+	{
+		printf("%d, ", temp->value);
+		temp = temp->next;
+	}
+	printf("NULL\n");
+}
+
 int	main(void)
 {
 	t_stack_node	*a;
 	t_stack_node	*b;
 	int				count;
-	int				length;
 	int				i;
-	int				numbers[] = {-491653, 78413, -498262, 257130, -267278, 419921, 359999, 394264, 312926, 99638, -133703, 263554, 320808, 409527, -208408, -79084, -2095, -108365, -469975, -469758, -247044, 25546, 489987, -60209, 267896, 91568, -471014, 416382, -367204, -47781, -214389, 152392, 494588, 397767, -449096, -205160, -145313, 442291, -444081, -99919, 439725, -216042, -264656, 131686, -453175, -247046, -430553, 106757, -139841, 319700, 284670, 127917, 61543, -374400, -205465, -196651, 307291, -209458, -303466, 238049, -389453, -387440, -15325, 465869, -195455, 366042, 420493, -235134, 331989, -157043, -57311, -464570, 75867, -187875, 440362, 434943, 436222, -139775, 492489, 408595, -375140, -225148, 490659, -224211, -332377, -334147, -136990, -214241, 146497, -118624, -105197, -466620, -264234, -54372, 306080, -396013, -257166, 16007, 458958, 228946};
-	int				list_length;
+	int				numbers[] = {949924, -166623, -909966, 154379, -83097, -763674, -799808, 282428, -895606, 496830, 161011, -250742, -629003, -76255, 780886, -980214, 781814, 983283, -117713, 545821, 562988, -842998, -916664, 583905, 838140, 854535, -272429, 996695, 382958, -802632, 928153, -633574, -990296, -967775, -725642, -853923, -787089, 332127, 96905, -860636, 230694, -930587, 65838, 842095, -28349, -291665, -305289, 551154, 352671, -953450, 303531, -677694, 377511, -839570, -446810, 355020, 653939, 507131, -738543, 306224, 859025, 620407, -527255, 1000502, 316624, -493922, 1010707, 446134, -368792, 226827, -563896, 683834, -878866, 295253, 838795, 887389, -36429, 288041, 537695, -470587, -212890, 592224, 485920, 344746, 496968, -502899, -458612, -127328, 34889, -393074, -84264, -101966, -691435, -963323, 909947, -206715, 182079, -601475, 241398, -370982};
 
 	a = NULL;
 	b = NULL;
 	count = 0;
-	length = sizeof(numbers) / sizeof(numbers[0]);
 	i = 0;
-	while (i < length)
+	while (i < sizeof(numbers) / sizeof(numbers[0]))
 	{
 		add_to_beginning(&a, numbers[i]);
 		i++;
 	}
-	// print_list(a);
-	list_length = ft_lstsize(a);
-	push_to_b(&a, &b, &count);
-	small_sort(&a, &count);
-	while (ft_lstsize(a) < list_length)
-	{
-		push_swap(&a, &b, &count);
-	}
-	print_list(b);
-	printf("Sorted List: \n");
-	while (a->value != find_smallest(&a)->value)
-	{
-		if (find_smallest(&a)->above_median == true)
-		{
-			rra(&a, &count);
-		}
-		else
-		{
-			ra(&a, &count);
-		}
-	}
+	sort(&a, &b, &count);
 	print_list(a);
 	printf("COUNT: %d\n", count);
 	printf("Is sorted: %d\n", is_sorted(a));
 	return (0);
 }
+
+// void	print_node_data(t_stack_node *head)
+// {
+// 	t_stack_node	*temp;
+
+// 	temp = head;
+// 	while (temp != NULL)
+// 	{
+// 		printf("Node Value is: %d, Node's Index is: %d, ", temp->value,
+// 			temp->index);
+// 		printf("and its above median: %d\n", temp->above_median);
+// 		printf("Its Target is: %d, Its Target index is: %d, ",
+// 			temp->target->value, temp->target->index);
+// 		printf("price to push is: %d, and its target above median: %d\n\n\n",
+// 			temp->price, temp->target->above_median);
+// 		temp = temp->next;
+// 	}
+// 	printf("NULL\n");
+// }
+
+// void	print_single_node_data(t_stack_node *head)
+// {
+// 	t_stack_node	*temp;
+
+// 	temp = head;
+// 	printf("Node Value is: %d, Node's Index is: %d, ", temp->value,
+// 		temp->index);
+// 	printf("and its above median: %d\n", temp->above_median);
+// 	printf("Its Target is: %d, Its Target index is: %d, ", temp->target->value,
+// 		temp->target->index);
+// 	printf("price to push is: %d, and its target above median: %d\n\n\n",
+// 		temp->price, temp->target->above_median);
+// }
 
 // Whole list of commands i have:
 // sa (swap a): Swap the first 2 elements at the top of stack a. Do nothing if there is only one or no elements.
