@@ -6,12 +6,13 @@
 /*   By: macbook <macbook@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 23:01:24 by auplisas          #+#    #+#             */
-/*   Updated: 2024/11/09 03:07:58 by macbook          ###   ########.fr       */
+/*   Updated: 2024/11/09 03:27:14 by macbook          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PUSH_SWAP_H
 # define PUSH_SWAP_H
+# include "libft/libft.h"
 # include <limits.h>
 # include <stdbool.h>
 # include <stdlib.h>
@@ -51,15 +52,6 @@ bool					has_duplicates(t_stack_node *stack);
 // free.c
 void					free_linked_list(t_stack_node *stack);
 char					**free_ar_of_ars(char **parentarray);
-
-// libft.c
-size_t					ft_strlen(const char *c);
-void					*ft_memmove(void *dst, const void *src, size_t n);
-void					*ft_memcpy(void *dst, const void *src, size_t n);
-void					*ft_memset(void *s, int c, size_t n);
-void					*ft_calloc(size_t count, size_t size);
-char					*ft_strdup(const char *src);
-char					**ft_split(char const *s, char c);
 
 // linked_list.c
 void					add_to_end(t_stack_node **head, int value);

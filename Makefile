@@ -6,7 +6,7 @@
 #    By: macbook <macbook@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/09 02:39:30 by macbook           #+#    #+#              #
-#    Updated: 2024/11/09 03:14:42 by macbook          ###   ########.fr        #
+#    Updated: 2024/11/09 03:22:56 by macbook          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,8 +23,8 @@ OBJS = $(SRCS:.c=.o)
 
 all: $(NAME)
 
-$(NAME): $(LIBFT) $(OBJDIR) $(OFILES)
-	$(CC) $(CFLAGS) -o $@ $(OFILES) -L$(LIBFT_DIR) -lft
+$(NAME): $(LIBFT) $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $(OBJS) -L$(LIBFT_DIR) -lft
 
 $(LIBFT):
 	$(MAKE) -C $(LIBFT_DIR)
