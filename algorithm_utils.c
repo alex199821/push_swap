@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   algorithm_utils.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: auplisas <auplisas@student.42.fr>          +#+  +:+       +#+        */
+/*   By: macbook <macbook@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 22:55:24 by auplisas          #+#    #+#             */
-/*   Updated: 2024/11/08 23:03:45 by auplisas         ###   ########.fr       */
+/*   Updated: 2024/11/09 03:08:14 by macbook          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,6 @@ t_stack_node	*find_smallest(t_stack_node **stack)
 
 void	push_to_b(t_stack_node **a, t_stack_node **b)
 {
-	while (ft_lstsize(*a) > 3)
+	while (lstsize(*a) > 3)
 		pb(a, b);
 }

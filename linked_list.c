@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   linked_list.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: auplisas <auplisas@student.42.fr>          +#+  +:+       +#+        */
+/*   By: macbook <macbook@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 22:47:03 by auplisas          #+#    #+#             */
-/*   Updated: 2024/11/08 23:03:39 by auplisas         ###   ########.fr       */
+/*   Updated: 2024/11/09 03:07:02 by macbook          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ t_stack_node	*create_node(int value)
 	new_node->target = NULL;
 	return (new_node);
 }
-
 
 void	add_to_end(t_stack_node **head, int value)
 {
@@ -87,10 +86,10 @@ t_stack_node	*remove_from_end(t_stack_node **head)
 	return (temp);
 }
 
-int	ft_lstsize(t_stack_node *stack)
+int	lstsize(t_stack_node *stack)
 {
-	int				i;
 	t_stack_node	*current;
+	int				i;
 
 	current = stack;
 	i = 0;

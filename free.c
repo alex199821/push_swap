@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   free.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: auplisas <auplisas@student.42.fr>          +#+  +:+       +#+        */
+/*   By: macbook <macbook@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 22:59:56 by auplisas          #+#    #+#             */
-/*   Updated: 2024/11/08 23:03:58 by auplisas         ###   ########.fr       */
+/*   Updated: 2024/11/09 02:40:47 by macbook          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,15 +28,15 @@ void	free_linked_list(t_stack_node *stack)
 
 char	**free_ar_of_ars(char **parentarray)
 {
-	int	j;
+	int	i;
 
-	j = 0;
+	i = 0;
 	if (parentarray == NULL)
 		return (NULL);
-	while (parentarray[j] != NULL)
+	while (parentarray[i] != NULL)
 	{
-		free(parentarray[j]);
-		j++;
+		free(parentarray[i]);
+		i++;
 	}
 	free(parentarray);
 	return (NULL);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   error_check.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: auplisas <auplisas@student.42.fr>          +#+  +:+       +#+        */
+/*   By: macbook <macbook@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 23:00:29 by auplisas          #+#    #+#             */
-/*   Updated: 2024/11/08 23:03:55 by auplisas         ###   ########.fr       */
+/*   Updated: 2024/11/09 02:40:50 by macbook          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,8 +74,8 @@ bool	has_minmax_int(t_stack_node *stack)
 
 bool	has_duplicates(t_stack_node *stack)
 {
-	t_stack_node *current;
-	t_stack_node *inner_current;
+	t_stack_node	*current;
+	t_stack_node	*inner_current;
 
 	current = stack;
 	while (current != NULL)
