@@ -6,10 +6,9 @@
 #    By: macbook <macbook@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/09 02:39:30 by macbook           #+#    #+#              #
-#    Updated: 2024/11/09 03:22:56 by macbook          ###   ########.fr        #
+#    Updated: 2024/11/09 03:52:24 by macbook          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
-
 
 NAME = push_swap
 CC = gcc
@@ -23,14 +22,14 @@ OBJS = $(SRCS:.c=.o)
 
 all: $(NAME)
 
-$(NAME): $(LIBFT) $(OBJS)
+$(NAME): $(OBJS) $(LIBFT)
 	$(CC) $(CFLAGS) -o $@ $(OBJS) -L$(LIBFT_DIR) -lft
-
-$(LIBFT):
-	$(MAKE) -C $(LIBFT_DIR)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
+
+$(LIBFT):
+	$(MAKE) -C $(LIBFT_DIR)
 
 clean:
 	rm -f $(OBJS)
